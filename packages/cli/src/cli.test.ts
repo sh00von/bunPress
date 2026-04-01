@@ -74,7 +74,7 @@ async function pointSiteAtLocalPackage(siteRoot: string) {
 
   packageJson.devDependencies = {
     ...(packageJson.devDependencies ?? {}),
-    "bunpressjs": `file:${path.resolve(import.meta.dir, "..")}`,
+    "bunpress-kit": `file:${path.resolve(import.meta.dir, "..")}`,
   };
 
   await writeFile(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`, "utf8");

@@ -13,11 +13,11 @@
     "examples/blog": {
       "name": "bunpress-example-blog",
       "dependencies": {
-        "bunpressjs": "workspace:*",
+        "bunpress-kit": "workspace:*",
       },
     },
     "packages/cli": {
-      "name": "bunpressjs",
+      "name": "bunpress-kit",
       "version": "1.0.1",
       "bin": {
         "bunpress": "./dist/bunpress.js",
@@ -108,7 +108,7 @@
 
     "bunpress-example-blog": ["bunpress-example-blog@workspace:examples/blog"],
 
-    "bunpressjs": ["bunpressjs@workspace:packages/cli"],
+    "bunpress-kit": ["bunpress-kit@workspace:packages/cli"],
 
     "ccount": ["ccount@2.0.1", "", {}, "sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg=="],
 

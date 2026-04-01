@@ -51,7 +51,7 @@ async function pointSiteAtLocalPackage(siteRoot: string) {
 
   packageJson.devDependencies = {
     ...(packageJson.devDependencies ?? {}),
-    bunpressjs: `file:${path.resolve(import.meta.dir, "../../cli")}`,
+    "bunpress-kit": `file:${path.resolve(import.meta.dir, "../../cli")}`,
   };
 
   await writeFile(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`, "utf8");
@@ -95,7 +95,7 @@ describe("create-bunpress", () => {
     const installResult = await runCreateCommand(siteRoot, "install");
     const buildResult = await runCreateCommand(siteRoot, builtCliPath, "build");
 
-    expect(packageJson).toContain('"bunpressjs"');
+    expect(packageJson).toContain('"bunpress-kit"');
     expect(readme).toContain("npx create-bunpress@latest mysite");
     expect(installResult.exitCode).toBe(0);
     expect(buildResult.exitCode).toBe(0);
