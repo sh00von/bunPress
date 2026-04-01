@@ -1,4 +1,4 @@
-import { copyFile, mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const distDir = path.resolve(import.meta.dir, "../dist");
@@ -10,7 +10,7 @@ const result = await Bun.build({
   naming: {
     entry: "main.js",
   },
-  target: "bun",
+  target: "node",
   format: "esm",
   minify: false,
 });
@@ -22,14 +22,11 @@ if (!result.success) {
   process.exit(1);
 }
 
-const wrapper = `#!/usr/bin/env bun
+const wrapper = `#!/usr/bin/env node
 import { run } from "./main.js";
 
 const exitCode = await run(process.argv.slice(2));
 process.exit(exitCode);
 `;
 
-await writeFile(path.join(distDir, "bunpress.js"), wrapper, "utf8");
-
-const jitiBabelPath = path.resolve(import.meta.dir, "../../core/node_modules/jiti/dist/babel.cjs");
-await copyFile(jitiBabelPath, path.join(distDir, "babel.cjs"));
+await writeFile(path.join(distDir, "create-bunpress.js"), wrapper, "utf8");

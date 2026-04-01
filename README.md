@@ -4,20 +4,21 @@ BunPress is a Bun-first static site generator and publishing CLI with a file-bas
 
 Open-source project by [Shovon](https://shovon.bd/).
 
-## Install
+## Create a Site
 
 ```bash
-bun install -g bunpress
+npx create-bunpress@latest mysite
 ```
 
-## Quick Start
+Then:
 
 ```bash
-bunpress init mysite
 cd mysite
-bunpress new post "Hello World"
+bun install
 bunpress dev
 ```
+
+For power users, `bunpress init mysite` still works after installing the CLI separately.
 
 ## Core Workflow
 

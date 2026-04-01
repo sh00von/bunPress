@@ -6,7 +6,7 @@ import { Command } from "commander";
 import { serve } from "@hono/node-server";
 import { buildSite, cleanSite, loadConfig, loadContent, type GitHubDeployConfig, type VercelDeployConfig } from "@bunpress/core";
 import { createDevServer, createStaticServer } from "@bunpress/dev-server";
-import { scaffoldPlugin, scaffoldSite, scaffoldTheme } from "./scaffold.ts";
+import { ensureEmptyOrMissing, scaffoldPlugin, scaffoldSite, scaffoldTheme } from "./scaffold.ts";
 
 type ContentKind = "post" | "page" | "draft";
 
@@ -26,19 +26,6 @@ function slugify(value: string): string {
 
 function normalizeName(value: string): string {
   return value.replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/-{2,}/g, "-").replace(/^-+|-+$/g, "");
-}
-
-async function ensureEmptyOrMissing(targetDir: string) {
-  try {
-    const entries = await readdir(targetDir);
-    if (entries.length > 0) {
-      throw new Error(`Refusing to init into non-empty directory: ${targetDir}`);
-    }
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-      throw error;
-    }
-  }
 }
 
 async function fileExists(filePath: string): Promise<boolean> {

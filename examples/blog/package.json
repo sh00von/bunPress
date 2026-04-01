@@ -12,6 +12,6 @@
     "publish:vercel": "bunpress publish vercel"
   },
   "dependencies": {
-    "bunpress": "workspace:*"
+    "bunpressjs": "workspace:*"
   }
 }

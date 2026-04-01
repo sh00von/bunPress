@@ -10,8 +10,9 @@
     "examples/*"
   ],
   "scripts": {
-    "build": "bun run build:cli",
+    "build": "bun run build:cli && bun run build:create",
     "build:cli": "bun --cwd packages/cli run build",
+    "build:create": "bun --cwd packages/create run build",
     "lint": "bunx tsc --noEmit",
     "test": "bun test",
     "build:example": "bun --cwd examples/blog run build",

@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const SITE_PACKAGE_JSON = `{
@@ -7,7 +7,7 @@ const SITE_PACKAGE_JSON = `{
   "type": "module",
   "packageManager": "bun@1.3.10",
   "devDependencies": {
-    "bunpress": "^1.0.0"
+    "bunpressjs": "^1.0.1"
   },
   "scripts": {
     "dev": "bunpress dev",
@@ -149,10 +149,16 @@ const SITE_README = `# BunPress Site
 
 ## Getting Started
 
-Install BunPress globally:
+\`\`\`bash
+npx create-bunpress@latest mysite
+\`\`\`
+
+Then:
 
 \`\`\`bash
-bun install -g bunpress
+cd mysite
+bun install
+bunpress dev
 \`\`\`
 
 Create content:
@@ -981,6 +987,19 @@ export function scaffoldFiles(): Map<string, string> {
     ["themes/starter/assets/favicon.svg", DEFAULT_FAVICON],
     ["themes/starter/assets/images/og-default.svg", DEFAULT_OG_IMAGE],
   ]);
+}
+
+export async function ensureEmptyOrMissing(targetDir: string): Promise<void> {
+  try {
+    const entries = await readdir(targetDir);
+    if (entries.length > 0) {
+      throw new Error(`Refusing to init into non-empty directory: ${targetDir}`);
+    }
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+      throw error;
+    }
+  }
 }
 
 export async function scaffoldSite(targetDir: string): Promise<void> {

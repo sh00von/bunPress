@@ -1,18 +1,11 @@
 # Getting Started
 
-## Install BunPress
-
-Install BunPress globally with Bun:
-
-```bash
-bun install -g bunpress
-```
-
 ## Create a Site
 
 ```bash
-bunpress init mysite
+npx create-bunpress@latest mysite
 cd mysite
+bun install
 ```
 
 This creates a complete BunPress site with:

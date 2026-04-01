@@ -21,7 +21,7 @@
       "@bunpress/dev-server": [
         "./packages/dev-server/src/index.ts"
       ],
-      "bunpress": [
+      "bunpressjs": [
         "./packages/cli/src/index.ts"
       ]
     }
