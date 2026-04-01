@@ -1,0 +1,26 @@
+<footer class="site-footer">
+  <div class="site-shell site-footer__inner">
+    <div>
+      <a class="site-footer__title" href="/">{{ site.title }}</a>
+      <p class="site-footer__copy">&copy; 2026 <a href="https://shovon.bd/" target="_blank" rel="noopener noreferrer">Shovon</a>. {{ site.title }}. Published with clarity.</p>
+    </div>
+    <nav class="site-footer__nav" aria-label="Footer">
+      {% if site.menus and site.menus.footer and site.menus.footer.length %}
+        {% for item in site.menus.footer %}
+          <a href="{{ item.url }}">{{ item.text }}</a>
+        {% endfor %}
+      {% else %}
+        <a href="/about/">About</a>
+        <a href="/archives/">Archives</a>
+        <a href="/tags/intro/">Tags</a>
+      {% endif %}
+    </nav>
+  </div>
+  {% if slots.site_footer.length %}
+    <div class="site-shell site-footer__extras">
+      {% set items = slots.site_footer %}
+      {% set className = "slot-items slot-items--inline site-footer__slot-links" %}
+      {% include "slot-items.njk" %}
+    </div>
+  {% endif %}
+</footer>

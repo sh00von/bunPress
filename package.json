@@ -1,0 +1,26 @@
+{
+  "name": "bunpress-workspace",
+  "private": true,
+  "license": "MIT",
+  "author": "Shovon <https://shovon.bd/>",
+  "homepage": "https://shovon.bd/",
+  "packageManager": "bun@1.3.10",
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "build": "bun run build:cli",
+    "build:cli": "bun --cwd packages/cli run build",
+    "lint": "bunx tsc --noEmit",
+    "test": "bun test",
+    "build:example": "bun --cwd examples/blog run build",
+    "dev:example": "bun --cwd examples/blog run dev",
+    "serve:example": "bun --cwd examples/blog run serve"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.11",
+    "bun-types": "^1.3.11",
+    "typescript": "^6.0.2"
+  }
+}

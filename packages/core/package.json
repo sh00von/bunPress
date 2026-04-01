@@ -1,0 +1,29 @@
+{
+  "name": "@bunpress/core",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Shovon <https://shovon.bd/>",
+  "homepage": "https://shovon.bd/",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.0",
+    "chokidar": "^4.0.3",
+    "fast-glob": "^3.3.3",
+    "gray-matter": "^4.0.3",
+    "hono": "^4.9.6",
+    "jiti": "^2.6.1",
+    "nunjucks": "^3.2.4",
+    "rehype-stringify": "^10.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "unified": "^11.0.5"
+  },
+  "devDependencies": {
+    "@types/nunjucks": "^3.2.6"
+  }
+}

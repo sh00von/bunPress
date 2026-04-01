@@ -1,0 +1,17 @@
+{
+  "name": "bunpress-example-blog",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bunpress dev",
+    "build": "bunpress build",
+    "serve": "bunpress serve",
+    "new:post": "bunpress new post",
+    "new:page": "bunpress new page",
+    "publish:github": "bunpress publish github",
+    "publish:vercel": "bunpress publish vercel"
+  },
+  "dependencies": {
+    "bunpress": "workspace:*"
+  }
+}

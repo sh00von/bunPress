@@ -1,0 +1,40 @@
+<div class="sidebar-panel">
+  <p class="sidebar-panel__eyebrow">Explore</p>
+  <h2 class="sidebar-panel__title">Browse the journal</h2>
+  <p class="sidebar-panel__text">{{ site.description }}</p>
+</div>
+
+{% if collections.categories.length %}
+  <section class="sidebar-section" aria-labelledby="sidebar-categories">
+    <h2 id="sidebar-categories" class="sidebar-section__title">Categories</h2>
+    <ul class="sidebar-list">
+      {% for category in collections.categories %}
+        <li><a href="{{ category.urlPath }}">{{ category.name }}</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
+
+{% if collections.tags.length %}
+  <section class="sidebar-section" aria-labelledby="sidebar-tags">
+    <h2 id="sidebar-tags" class="sidebar-section__title">Tags</h2>
+    <ul class="sidebar-list sidebar-list--tags">
+      {% for tag in collections.tags %}
+        <li><a href="{{ tag.urlPath }}">{{ tag.name }}</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
+
+{% if collections.posts.length %}
+  <section class="sidebar-section" aria-labelledby="sidebar-recent">
+    <h2 id="sidebar-recent" class="sidebar-section__title">Recent posts</h2>
+    <ul class="sidebar-list">
+      {% for post in collections.posts %}
+        {% if loop.index <= 5 %}
+          <li><a href="{{ post.urlPath }}">{{ post.title }}</a></li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}

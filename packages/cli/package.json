@@ -1,0 +1,25 @@
+{
+  "name": "bunpress",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Shovon <https://shovon.bd/>",
+  "homepage": "https://shovon.bd/",
+  "type": "module",
+  "main": "./dist/main.js",
+  "bin": {
+    "bunpress": "./dist/bunpress.js"
+  },
+  "exports": {
+    ".": "./dist/main.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun ./scripts/build.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.0",
+    "commander": "^14.0.1"
+  }
+}

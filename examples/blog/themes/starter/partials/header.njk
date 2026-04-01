@@ -1,0 +1,21 @@
+<header class="site-header">
+  <div class="site-shell site-header__inner">
+    <a class="site-brand" href="/">{{ site.title }}</a>
+    <nav class="site-nav" aria-label="Primary">
+      {% if site.menus and site.menus.primary and site.menus.primary.length %}
+        {% for item in site.menus.primary %}
+          <a class="site-nav__link" href="{{ item.url }}">{{ item.text }}</a>
+        {% endfor %}
+      {% else %}
+        <a class="site-nav__link" href="/">Home</a>
+        <a class="site-nav__link" href="/archives/">Archives</a>
+        <a class="site-nav__link" href="/about/">About</a>
+      {% endif %}
+    </nav>
+    {% if slots.site_header.length %}
+      {% set items = slots.site_header %}
+      {% set className = "slot-items slot-items--inline site-header__slot-links" %}
+      {% include "slot-items.njk" %}
+    {% endif %}
+  </div>
+</header>
