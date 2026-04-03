@@ -1,7 +1,7 @@
 export default {
-  title: "My BunPress Blog",
+  title: "Platform Briefing",
   url: "http://localhost:3000/",
-  description: "A Bun-first static site powered by BunPress.",
+  description: "Clear updates on product direction, platform decisions, and engineering execution.",
   language: "en",
   // Available permalinkStyle values:
   // "day-and-name" -> "/:year/:month/:day/:slug/"
@@ -13,10 +13,10 @@ export default {
   theme: "starter",
   paginationSize: 5,
   seo: {
-    siteName: "My BunPress Blog",
-    defaultDescription: "A Bun-first static publishing site with built-in metadata, schema, and crawlable output.",
+    siteName: "Platform Briefing",
+    defaultDescription: "A Bun-first publishing system for product, platform, and engineering communication.",
     defaultOgImage: "/assets/images/og-default.svg",
-    defaultOgImageAlt: "BunPress editorial site preview",
+    defaultOgImageAlt: "BunPress product publishing preview",
     favicon: "/assets/favicon.svg",
     themeColor: "#111111",
     robotsTxt: `User-agent: *
@@ -82,18 +82,9 @@ Sitemap: http://localhost:3000/sitemap.xml
         },
       ],
     },
-    siteChrome: {
-      headerLinks: [
-        // {
-        //   text: "Start Here",
-        //   url: "/about/",
-        //   kind: "button",
-        // },
-      ],
-    },
     authorBox: {
       heading: "Written by",
-      siteLabel: "Published on BunPress",
+      siteLabel: "Prepared for product and engineering teams",
     },
   },
   plugins: [
@@ -101,7 +92,6 @@ Sitemap: http://localhost:3000/sitemap.xml
     "./plugins/author-box.ts",
     "./plugins/related-posts.ts",
     "./plugins/share-buttons.ts",
-    "./plugins/site-chrome.ts",
     "./plugins/social-links.ts",
   ],
   deploy: {

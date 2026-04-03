@@ -12,10 +12,5 @@
         <a class="site-nav__link" href="{{ href('/about/', currentUrlPath) }}">About</a>
       {% endif %}
     </nav>
-    {% if slots.site_header.length %}
-      {% set items = slots.site_header %}
-      {% set className = "slot-items slot-items--inline site-header__slot-links" %}
-      {% include "slot-items.njk" %}
-    {% endif %}
   </div>
 </header>

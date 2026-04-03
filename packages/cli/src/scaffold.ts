@@ -7,7 +7,7 @@ const SITE_PACKAGE_JSON = `{
   "type": "module",
   "packageManager": "bun@1.3.10",
   "devDependencies": {
-    "bunpress-kit": "^1.0.4"
+      "bunpress-kit": "^1.0.5"
   },
   "scripts": {
     "dev": "bunpress dev",
@@ -23,9 +23,9 @@ const SITE_PACKAGE_JSON = `{
 `;
 
 const SITE_CONFIG = `export default {
-  title: "My BunPress Blog",
+  title: "Platform Briefing",
   url: "http://localhost:3000/",
-  description: "A Bun-first static site powered by BunPress.",
+  description: "Clear updates on product direction, platform decisions, and engineering execution.",
   language: "en",
   // Available permalinkStyle values:
   // "day-and-name" -> "/:year/:month/:day/:slug/"
@@ -37,12 +37,12 @@ const SITE_CONFIG = `export default {
   theme: "starter",
   paginationSize: 5,
   seo: {
-    siteName: "My BunPress Blog",
-    defaultDescription: "A Bun-first static publishing site with built-in metadata, schema, and crawlable output.",
+    siteName: "Platform Briefing",
+    defaultDescription: "A Bun-first publishing system for product, platform, and engineering communication.",
     defaultOgImage: "/assets/images/og-default.svg",
-    defaultOgImageAlt: "BunPress default social preview",
+    defaultOgImageAlt: "BunPress product publishing preview",
     favicon: "/assets/favicon.svg",
-    themeColor: "#c2410c",
+    themeColor: "#111111",
     robotsTxt: \`User-agent: *
 Allow: /
 Sitemap: http://localhost:3000/sitemap.xml
@@ -105,14 +105,9 @@ Sitemap: http://localhost:3000/sitemap.xml
         },
       ],
     },
-    siteChrome: {
-      headerLinks: [
-        { text: "Start Here", url: "/about/", kind: "button" },
-      ],
-    },
     authorBox: {
       heading: "Written by",
-      siteLabel: "Published on BunPress",
+      siteLabel: "Prepared for product and engineering teams",
     },
   },
   plugins: [
@@ -120,7 +115,6 @@ Sitemap: http://localhost:3000/sitemap.xml
     "./plugins/author-meta.ts",
     "./plugins/author-box.ts",
     "./plugins/share-buttons.ts",
-    "./plugins/site-chrome.ts",
     "./plugins/social-links.ts",
   ],
   deploy: {
@@ -337,49 +331,34 @@ const SHARE_BUTTONS_PLUGIN = `export default async function shareButtonsPlugin(a
 }
 `;
 
-const SITE_CHROME_PLUGIN = `export default async function siteChromePlugin(api) {
-  api.slot("site_header", ({ config }) => {
-    const pluginConfig = config.pluginsConfig.siteChrome ?? {};
-    return pluginConfig.headerLinks ?? [];
-  });
-
-  api.slot("sidebar_primary", ({ config }) => {
-    const pluginConfig = config.pluginsConfig.siteChrome ?? {};
-    return pluginConfig.sidebarLinks ?? [];
-  });
-}
-`;
-
 const HOME_POST = `---
-title: Hello BunPress
+title: Building a publishing system for product and engineering teams
 slug: hello-bunpress
 date: 2026-04-01T10:00:00.000Z
 author: BunPress Team
 tags:
-  - intro
+  - platform
   - bunpress
 categories:
   - announcements
 ---
 
-Welcome to your new BunPress site. This first post proves the full pipeline works: front matter, Markdown, layouts, taxonomy pages, and static output.
+BunPress is designed for teams that need a fast, controlled way to publish product updates, engineering notes, and platform decisions.
 
 <!-- more -->
 
-You can now:
+The starter site is intentionally minimal so teams can ship clear writing without rebuilding the publishing stack.
 
-- run \`bunpress dev\`
-- create more posts with \`bunpress new post "My Title"\`
-- draft ideas with \`bunpress new draft "Future Post"\`
-- publish with \`bunpress publish github\` or \`bunpress publish vercel\`
+- Run \`bunpress dev\` for a local review loop.
+- Create new entries with \`bunpress new post "Title"\`.
+- Publish a static build to GitHub Pages or Vercel when the site is ready.
 `;
 
 const ABOUT_PAGE = `---
 title: About
-description: Learn what BunPress ships with by default and how its built-in SEO works.
 ---
 
-This site ships with BunPress, Nunjucks theme rendering, and a simple plugin API.
+BunPress is a Bun-first static publishing engine for product, platform, and engineering communication. The default starter favors strong defaults, clean presentation, and fast deployment.
 `;
 
 const POST_SCAFFOLD = `---
@@ -503,11 +482,6 @@ const HEADER_PARTIAL = `<header class="site-header">
         <a class="site-nav__link" href="{{ href('/about/', currentUrlPath) }}">About</a>
       {% endif %}
     </nav>
-    {% if slots.site_header.length %}
-      {% set items = slots.site_header %}
-      {% set className = "slot-items slot-items--inline site-header__slot-links" %}
-      {% include "slot-items.njk" %}
-    {% endif %}
   </div>
 </header>
 `;
@@ -516,7 +490,7 @@ const FOOTER_PARTIAL = `<footer class="site-footer">
   <div class="site-shell site-footer__inner">
     <div>
       <a class="site-footer__title" href="{{ href('/', currentUrlPath) }}">{{ site.title }}</a>
-      <p class="site-footer__copy">&copy; 2026 <a href="https://shovon.bd/" target="_blank" rel="noopener noreferrer">Shovon</a>. {{ site.title }}. Published with clarity.</p>
+      <p class="site-footer__copy">&copy; 2026 <a href="https://shovon.bd/" target="_blank" rel="noopener noreferrer">Shovon</a>. {{ site.title }}. Strategy, product, and engineering communication.</p>
     </div>
     <nav class="site-footer__nav" aria-label="Footer">
       {% if site.menus and site.menus.footer and site.menus.footer.length %}
@@ -558,8 +532,8 @@ const BREADCRUMBS_PARTIAL = `{% if seo.breadcrumbs.length > 1 %}
 `;
 
 const SIDEBAR_PARTIAL = `<div class="sidebar-panel">
-  <p class="sidebar-panel__eyebrow">Explore</p>
-  <h2 class="sidebar-panel__title">Browse the journal</h2>
+  <p class="sidebar-panel__eyebrow">Navigate</p>
+  <h2 class="sidebar-panel__title">Platform overview</h2>
   <p class="sidebar-panel__text">{{ site.description }}</p>
 </div>
 
@@ -587,7 +561,7 @@ const SIDEBAR_PARTIAL = `<div class="sidebar-panel">
 
 {% if collections.posts.length %}
   <section class="sidebar-section" aria-labelledby="sidebar-recent">
-    <h2 id="sidebar-recent" class="sidebar-section__title">Recent posts</h2>
+    <h2 id="sidebar-recent" class="sidebar-section__title">Latest updates</h2>
     <ul class="sidebar-list">
       {% for post in collections.posts %}
         {% if loop.index <= 5 %}
@@ -661,7 +635,7 @@ const POST_META_PARTIAL = `{% set metaItems = items or [] %}
 const INDEX_LAYOUT = `{% extends "base.njk" %}
 {% block content %}
   <section class="page-intro">
-    <p class="page-intro__eyebrow">Journal</p>
+    <p class="page-intro__eyebrow">Technical leadership</p>
     <h1 class="page-intro__title">{{ site.title }}</h1>
     <p class="page-intro__text">{{ site.description }}</p>
   </section>
@@ -682,7 +656,7 @@ const INDEX_LAYOUT = `{% extends "base.njk" %}
           {% include "post-meta.njk" %}
           <h2 class="post-card__title"><a href="{{ href(post.urlPath, currentUrlPath) }}">{{ post.title }}</a></h2>
           <p class="post-card__excerpt">{{ post.excerpt }}</p>
-          <a class="post-card__link" href="{{ href(post.urlPath, currentUrlPath) }}">Continue reading</a>
+          <a class="post-card__link" href="{{ href(post.urlPath, currentUrlPath) }}">Read briefing</a>
         </div>
       </article>
     {% endfor %}
@@ -751,7 +725,7 @@ const PAGE_LAYOUT = `{% extends "base.njk" %}
 {% block content %}
   <article class="entry entry--page">
     <header class="entry__header">
-      <p class="entry__meta">Page</p>
+      <p class="entry__meta">Overview</p>
       <h1 class="entry__title">{{ page.page.title }}</h1>
     </header>
 
@@ -800,7 +774,7 @@ const TAXONOMY_LAYOUT = `{% extends "base.njk" %}
           {% include "post-meta.njk" %}
           <h2 class="post-card__title"><a href="{{ href(post.urlPath, currentUrlPath) }}">{{ post.title }}</a></h2>
           <p class="post-card__excerpt">{{ post.excerpt }}</p>
-          <a class="post-card__link" href="{{ href(post.urlPath, currentUrlPath) }}">Continue reading</a>
+          <a class="post-card__link" href="{{ href(post.urlPath, currentUrlPath) }}">Read briefing</a>
         </div>
       </article>
     {% endfor %}
@@ -849,9 +823,9 @@ const NOT_FOUND_LAYOUT = `{% extends "base.njk" %}
 {% block content %}
   <section class="empty-state">
     <p class="empty-state__eyebrow">404</p>
-    <h1 class="empty-state__title">Page not found</h1>
-    <p class="empty-state__text">The page you requested does not exist, or it may have moved.</p>
-    <a class="empty-state__link" href="{{ href('/', currentUrlPath) }}">Return home</a>
+    <h1 class="empty-state__title">Resource unavailable</h1>
+    <p class="empty-state__text">The requested page is not available at this address or is no longer published.</p>
+    <a class="empty-state__link" href="{{ href('/', currentUrlPath) }}">Return to home</a>
   </section>
 {% endblock %}
 `;
@@ -936,11 +910,11 @@ img {
 }
 
 .site-header__inner {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 24px;
-  padding: 28px 0 22px;
+  padding: 24px 0 18px;
 }
 
 .site-layout {
@@ -964,10 +938,6 @@ img {
   color: var(--muted);
 }
 
-.site-header__slot-links {
-  margin: 0 0 0 auto;
-}
-
 .site-nav__link:hover,
 .site-footer__nav a:hover,
 .post-card__title a:hover,
@@ -978,8 +948,8 @@ img {
 }
 
 .page-intro {
-  max-width: 680px;
-  padding: 52px 0 32px;
+  max-width: 760px;
+  padding: 48px 0 28px;
 }
 
 .page-intro--compact {
@@ -1021,16 +991,16 @@ img {
 .post-feed--compact {
   display: flex;
   flex-direction: column;
-  gap: 56px;
-  padding-bottom: 56px;
+  gap: 48px;
+  padding-bottom: 52px;
 }
 
 .post-card {
   display: grid;
   grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
-  gap: 28px;
+  gap: 24px;
   align-items: start;
-  padding-bottom: 40px;
+  padding-bottom: 36px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -1111,7 +1081,7 @@ img {
 }
 
 .post-card__excerpt {
-  margin: 0 0 18px;
+  margin: 0 0 14px;
 }
 
 .post-card__link,
@@ -1305,7 +1275,7 @@ img {
   justify-content: space-between;
   align-items: flex-end;
   gap: 24px;
-  padding: 28px 0 44px;
+  padding: 24px 0 40px;
 }
 
 .site-footer__title {
@@ -1542,7 +1512,6 @@ export function scaffoldFiles(): Map<string, string> {
     ["plugins/author-meta.ts", AUTHOR_META_PLUGIN],
     ["plugins/author-box.ts", AUTHOR_BOX_PLUGIN],
     ["plugins/share-buttons.ts", SHARE_BUTTONS_PLUGIN],
-    ["plugins/site-chrome.ts", SITE_CHROME_PLUGIN],
     ["plugins/social-links.ts", SOCIAL_LINKS_PLUGIN],
     ["content/posts/2026-04-01-hello-bunpress.md", HOME_POST],
     ["content/pages/about.md", ABOUT_PAGE],

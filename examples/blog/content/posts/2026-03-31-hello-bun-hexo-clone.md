@@ -1,21 +1,21 @@
 ---
-title: Hello BunPress
+title: Building a publishing system for product and engineering teams
 slug: hello-bunpress
 date: 2026-03-31T10:00:00.000Z
 author: BunPress Team
 tags:
-  - intro
+  - platform
   - bun
 categories:
   - announcements
 ---
 
-Welcome to your new BunPress site. This post proves the full pipeline works: front matter, Markdown, layouts, taxonomy pages, and static output.
+BunPress is designed for teams that need a fast, controlled way to publish product updates, engineering notes, and platform decisions.
 
 <!-- more -->
 
-You can now:
+The starter site is intentionally minimal so teams can ship clear writing without rebuilding the publishing stack.
 
-- run `bunpress dev`
-- create more posts with `bunpress new post "My Title"`
-- publish with `bunpress publish github` or `bunpress publish vercel`
+- Run `bunpress dev` for a local review loop.
+- Create new entries with `bunpress new post "Title"`.
+- Publish a static build to GitHub Pages or Vercel when the site is ready.

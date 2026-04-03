@@ -2,4 +2,4 @@
 title: About
 ---
 
-This demo blog ships with a Bun-first engine, Nunjucks theme rendering, and a small plugin API.
+BunPress is a Bun-first static publishing engine for product, platform, and engineering communication. The default starter favors strong defaults, clean presentation, and fast deployment.

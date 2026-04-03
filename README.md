@@ -20,6 +20,8 @@ bunpress dev
 
 For power users, `bunpress init mysite` still works after installing the CLI separately.
 
+New starter sites ship with a clean product-and-engineering voice by default, so the first generated site already reads like a professional platform publication instead of a generic demo blog.
+
 ## Core Workflow
 
 ```bash
@@ -59,6 +61,6 @@ BunPress now documents its extension system as an official contract:
 - themes use required layouts like `index`, `post`, `page`, `taxonomy`, `archive`, and `404`
 - plugins are enabled explicitly in `site.config.ts`
 - plugins can register lifecycle hooks, helpers, and theme slots
-- the starter theme automatically renders supported slot output such as `post_meta`
+- the starter theme automatically renders supported slot output such as `post_meta`, `post_footer`, and `site_footer`
 
 Stable and experimental support levels are documented in the reference guide.

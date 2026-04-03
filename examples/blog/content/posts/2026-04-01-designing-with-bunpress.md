@@ -1,8 +1,8 @@
 ---
-title: Designing with BunPress
+title: Designing a dependable theme contract
 slug: designing-with-bunpress
 date: 2026-04-01T14:30:00.000Z
-author: Editorial Desk
+author: Product Engineering
 tags:
   - bun
   - design
@@ -10,12 +10,12 @@ categories:
   - announcements
 ---
 
-BunPress is most useful when the theme and plugin system feel predictable for both site owners and developers.
+BunPress becomes more valuable when the theme and plugin contract stays predictable for both site owners and extension developers.
 
 <!-- more -->
 
-This follow-up post gives the demo blog a second article so plugin-driven features like related posts can appear naturally.
+This second article demonstrates how a professional starter site can expose related content, metadata, and archive flows without custom theme work.
 
-- shared tags create overlapping topic groups
-- shared categories make archive and taxonomy pages more realistic
-- author metadata helps test post meta rendering across templates
+- Shared tags create credible topic overlap for related content.
+- Shared categories make archive and taxonomy pages more representative.
+- Author metadata keeps post summaries useful across index and detail views.

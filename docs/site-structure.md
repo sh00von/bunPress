@@ -57,17 +57,18 @@ Typical fields:
 
 ```ts
 export default {
-  title: "My BunPress Blog",
+  title: "Platform Briefing",
   url: "http://localhost:3000/",
-  description: "A Bun-first static site powered by BunPress.",
+  description: "Clear updates on product direction, platform decisions, and engineering execution.",
   language: "en",
   permalinkStyle: "day-and-name",
   theme: "starter",
   paginationSize: 5,
   seo: {
-    siteName: "My BunPress Blog",
-    defaultDescription: "Built-in metadata and schema for BunPress.",
+    siteName: "Platform Briefing",
+    defaultDescription: "A Bun-first publishing system for product, platform, and engineering communication.",
     defaultOgImage: "/assets/images/og-default.svg",
+    defaultOgImageAlt: "BunPress product publishing preview",
     favicon: "/assets/favicon.svg",
     themeColor: "#111111",
     robotsTxt: "User-agent: *\\nAllow: /\\nSitemap: https://example.com/sitemap.xml\\n",
@@ -92,6 +93,8 @@ Notable config sections:
 - `menus` gives themes a stable place to read primary and footer navigation.
 - `socialLinks` is a simple global link list used by the demo social-links plugin.
 - `pluginsConfig` is the preferred place for plugin-specific options.
+
+The starter scaffold does not ship a default header call-to-action config. Header extension points still exist for custom themes, but the default starter stays intentionally restrained and product-focused.
 
 Permalink behavior:
 

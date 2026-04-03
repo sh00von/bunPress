@@ -73,6 +73,7 @@ The starter theme demonstrates:
 - explicit blog slot render positions around post/page content and site footer
 - a consistent `base.njk` shell
 - responsive layouts using a single site stylesheet
+- a professional product-and-engineering tone without a default header CTA
 
 ## Theme Slots
 
@@ -97,8 +98,8 @@ The starter theme renders:
 - `post_meta` for homepage, post, archive, and taxonomy views
 - `post_above_content`, `post_below_content`, and `post_footer` on single posts
 - `page_above_content`, `page_below_content`, and `page_footer` on standalone pages
-- `site_header` in the header row for lightweight actions or links
-- `sidebar_primary` as an optional right-column extension area
 - `site_footer` in the footer area
+
+The starter theme does not render `site_header` or `sidebar_primary` by default. Those slots remain available for custom themes that want a more extensible chrome or sidebar system.
 
 See [Plugin Slots](D:\work\hexo-clone-node\docs\plugins\slots.md).

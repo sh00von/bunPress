@@ -28,17 +28,17 @@ Configure SEO in `site.config.ts`:
 ```ts
 export default {
   seo: {
-    siteName: "My BunPress Blog",
+    siteName: "Platform Briefing",
     titleTemplate: "%s | %siteName%",
-    defaultDescription: "A Bun-first publishing site with built-in SEO.",
+    defaultDescription: "A Bun-first publishing system for product, platform, and engineering communication.",
     defaultOgImage: "/assets/images/og-default.svg",
-    defaultOgImageAlt: "BunPress default social preview",
+    defaultOgImageAlt: "BunPress product publishing preview",
     favicon: "/assets/favicon.svg",
     themeColor: "#111111",
     robotsTxt: "User-agent: *\\nAllow: /\\nSitemap: https://example.com/sitemap.xml\\n",
     organization: {
-      name: "BunPress Studio",
-      sameAs: ["https://github.com/example/bunpress"],
+      name: "Platform Briefing",
+      sameAs: ["https://shovon.bd/"],
     },
     verification: {
       google: "your-token",

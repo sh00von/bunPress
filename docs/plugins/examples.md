@@ -192,7 +192,7 @@ const socialLinksPlugin: Plugin = async (api) => {
 export default socialLinksPlugin;
 ```
 
-## Site Header and Sidebar Plugin
+## Custom Theme Chrome Plugin
 
 ```ts
 import type { Plugin } from "@bunpress/core";
@@ -210,19 +210,21 @@ const siteChromePlugin: Plugin = async (api) => {
 export default siteChromePlugin;
 ```
 
-Example site config:
+Example site config for a custom theme that intentionally exposes header and sidebar extension areas:
 
 ```ts
 pluginsConfig: {
   siteChrome: {
-    headerLinks: [{ text: "Start Here", url: "/about/", kind: "button" }],
+    headerLinks: [{ text: "Platform status", url: "/status/", kind: "button" }],
     sidebarLinks: [
-      { text: "Browse the site", icon: "•" },
-      { text: "Announcements", url: "/categories/announcements/" },
+      { text: "Release calendar", url: "/release-calendar/" },
+      { text: "Platform notes", url: "/categories/platform/" },
     ],
   },
 }
 ```
+
+The default BunPress starter theme does not use this plugin pattern. It is intended for custom themes that explicitly choose to render `site_header` or `sidebar_primary`.
 
 ## Shared Theme Partial Pattern
 

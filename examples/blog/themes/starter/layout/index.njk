@@ -1,7 +1,7 @@
 {% extends "base.njk" %}
 {% block content %}
   <section class="page-intro">
-    <p class="page-intro__eyebrow">Journal</p>
+    <p class="page-intro__eyebrow">Technical leadership</p>
     <h1 class="page-intro__title">{{ site.title }}</h1>
     <p class="page-intro__text">{{ site.description }}</p>
   </section>
@@ -22,7 +22,7 @@
           {% include "post-meta.njk" %}
           <h2 class="post-card__title"><a href="{{ href(post.urlPath, currentUrlPath) }}">{{ post.title }}</a></h2>
           <p class="post-card__excerpt">{{ post.excerpt }}</p>
-          <a class="post-card__link" href="{{ href(post.urlPath, currentUrlPath) }}">Continue reading</a>
+          <a class="post-card__link" href="{{ href(post.urlPath, currentUrlPath) }}">Read briefing</a>
         </div>
       </article>
     {% endfor %}

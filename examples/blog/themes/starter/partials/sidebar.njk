@@ -1,6 +1,6 @@
 <div class="sidebar-panel">
-  <p class="sidebar-panel__eyebrow">Explore</p>
-  <h2 class="sidebar-panel__title">Browse the journal</h2>
+  <p class="sidebar-panel__eyebrow">Navigate</p>
+  <h2 class="sidebar-panel__title">Platform overview</h2>
   <p class="sidebar-panel__text">{{ site.description }}</p>
 </div>
 
@@ -28,7 +28,7 @@
 
 {% if collections.posts.length %}
   <section class="sidebar-section" aria-labelledby="sidebar-recent">
-    <h2 id="sidebar-recent" class="sidebar-section__title">Recent posts</h2>
+    <h2 id="sidebar-recent" class="sidebar-section__title">Latest updates</h2>
     <ul class="sidebar-list">
       {% for post in collections.posts %}
         {% if loop.index <= 5 %}

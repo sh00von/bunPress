@@ -2,8 +2,8 @@
 {% block content %}
   <section class="empty-state">
     <p class="empty-state__eyebrow">404</p>
-    <h1 class="empty-state__title">Page not found</h1>
-    <p class="empty-state__text">The page you requested does not exist, or it may have moved.</p>
-    <a class="empty-state__link" href="{{ href('/', currentUrlPath) }}">Return home</a>
+    <h1 class="empty-state__title">Resource unavailable</h1>
+    <p class="empty-state__text">The requested page is not available at this address or is no longer published.</p>
+    <a class="empty-state__link" href="{{ href('/', currentUrlPath) }}">Return to home</a>
   </section>
 {% endblock %}

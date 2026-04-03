@@ -134,6 +134,7 @@ describe("cli", () => {
 
     const topLevelEntries = await readdir(siteRoot);
     const packageJson = await readFile(path.join(siteRoot, "package.json"), "utf8");
+    const siteConfig = await readFile(path.join(siteRoot, "site.config.ts"), "utf8");
     const draftScaffold = await readFile(path.join(siteRoot, "scaffolds/draft.md"), "utf8");
 
     expect(topLevelEntries).toContain("site.config.ts");
@@ -143,6 +144,8 @@ describe("cli", () => {
     expect(packageJson).toContain('"build": "bunpress build"');
     expect(packageJson).toContain('"new:draft": "bunpress new draft"');
     expect(packageJson).not.toContain("packages/cli");
+    expect(siteConfig).not.toContain("headerLinks");
+    expect(siteConfig).not.toContain("siteChrome");
     expect(draftScaffold).toContain("draft: true");
   });
 
@@ -234,7 +237,7 @@ describe("cli", () => {
 
     const builtIndex = await readFile(path.join(siteRoot, "public/index.html"), "utf8");
 
-    expect(builtIndex).toContain("My BunPress Blog");
+    expect(builtIndex).toContain("Platform Briefing");
     expect(builtIndex).not.toContain("Queued Thoughts");
   });
 

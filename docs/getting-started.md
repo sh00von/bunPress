@@ -17,6 +17,8 @@ This creates a complete BunPress site with:
 - `scaffolds/`
 - `public/` once you build
 
+The default starter also ships with a professional product-and-engineering tone, so a fresh site already looks appropriate for platform updates, release notes, or CTO-style publishing.
+
 ## Create Content
 
 ```bash
