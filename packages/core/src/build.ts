@@ -1,6 +1,9 @@
 import path from "node:path";
 import { mkdir, rm } from "node:fs/promises";
 import type {
+  BuildOptions,
+  BuildPhaseId,
+  BuildProgressEvent,
   BuildResult,
   ContentGraph,
   Page,
@@ -31,6 +34,41 @@ import {
 import { toRelativeHref, writeFileIfChanged } from "./utils.ts";
 
 type SlotMap = Record<ThemeSlotName, Record<string, ThemeSlotItem[]> | ThemeSlotItem[]>;
+
+const BUILD_PHASES: Array<{ id: BuildPhaseId; label: string }> = [
+  { id: "config", label: "Load config" },
+  { id: "content", label: "Load content" },
+  { id: "transform", label: "Transform content" },
+  { id: "routes", label: "Generate routes" },
+  { id: "assets", label: "Prepare output" },
+  { id: "render", label: "Render pages" },
+  { id: "artifacts", label: "Generate artifacts" },
+  { id: "warnings", label: "Collect warnings" },
+  { id: "complete", label: "Complete" },
+];
+
+function createProgressEmitter(onProgress?: (event: BuildProgressEvent) => void) {
+  const phaseCount = BUILD_PHASES.length;
+
+  return (phaseId: BuildPhaseId, detail?: string) => {
+    if (!onProgress) {
+      return;
+    }
+
+    const phaseIndex = BUILD_PHASES.findIndex((phase) => phase.id === phaseId);
+    if (phaseIndex === -1) {
+      return;
+    }
+
+    onProgress({
+      phaseId,
+      phaseLabel: BUILD_PHASES[phaseIndex]?.label ?? phaseId,
+      phaseIndex: phaseIndex + 1,
+      phaseCount,
+      detail,
+    });
+  };
+}
 
 function createEmptySlotMap(): SlotMap {
   return {
@@ -212,8 +250,11 @@ export async function cleanSite(cwd: string): Promise<void> {
   await rm(config.publicRoot, { force: true, recursive: true });
 }
 
-export async function buildSite(cwd: string): Promise<BuildResult> {
+export async function buildSite(cwd: string, options: BuildOptions = {}): Promise<BuildResult> {
   const startedAt = new Date().toISOString();
+  const emitProgress = createProgressEmitter(options.onProgress);
+
+  emitProgress("config");
   let config = await loadConfig(cwd);
   config = await resolveThemeConfig(config);
 
@@ -225,13 +266,18 @@ export async function buildSite(cwd: string): Promise<BuildResult> {
 
   await plugins.run("config:resolved", { config });
 
+  emitProgress("content");
   const content = await loadContent(config);
   await plugins.run("content:loaded", { config, content });
+
+  emitProgress("transform");
   await plugins.run("content:transformed", { config, content });
 
+  emitProgress("routes");
   const routes = generateRoutes(config, content);
   await plugins.run("routes:generated", { config, content, routes });
 
+  emitProgress("assets");
   await rm(config.publicRoot, { force: true, recursive: true });
   await mkdir(config.publicRoot, { recursive: true });
   await copyThemeAssets(config);
@@ -240,72 +286,79 @@ export async function buildSite(cwd: string): Promise<BuildResult> {
   const engineAssets: Record<string, string> = {};
   const renderedPages: Array<{ route: RouteManifestEntry; html: string }> = [];
 
-  for (const route of routes) {
-    const locals = await renderLocals(
+  try {
+    emitProgress("render", routes.length > 0 ? `0/${routes.length} routes` : "0 routes");
+    for (const [index, route] of routes.entries()) {
+      emitProgress("render", `${index + 1}/${routes.length} routes`);
+      const locals = await renderLocals(
+        config,
+        content,
+        route,
+        plugins,
+        routes,
+        engineAssets,
+      );
+      const html = await theme.render(
+        route.layout,
+        locals,
+      );
+      await writeFileIfChanged(route.outputPath, html);
+      renderedPages.push({ route, html });
+    }
+
+    emitProgress("artifacts");
+    const redirectArtifacts = buildRedirectArtifacts(config, content, routes);
+    await writeRedirectOutputs(config, redirectArtifacts.redirects);
+
+    await writeFileIfChanged(
+      path.join(config.publicRoot, "sitemap.xml"),
+      buildSitemapXml(config, routes, content),
+    );
+    await writeFileIfChanged(
+      path.join(config.publicRoot, "robots.txt"),
+      buildRobotsTxt(config),
+    );
+    await writeFileIfChanged(
+      path.join(config.publicRoot, "feed.xml"),
+      buildRssXml(config, content),
+    );
+    await writeFileIfChanged(
+      path.join(config.publicRoot, "atom.xml"),
+      buildAtomXml(config, content),
+    );
+    if (redirectArtifacts.redirectsFile) {
+      await writeFileIfChanged(
+        path.join(config.publicRoot, "_redirects"),
+        redirectArtifacts.redirectsFile,
+      );
+    }
+
+    emitProgress("warnings");
+    const warnings = await collectBuildWarnings({
       config,
       content,
-      route,
-      plugins,
       routes,
+      redirects: redirectArtifacts.redirects,
+      renderedPages,
+    });
+
+    const result: BuildResult = {
+      outputDir: config.publicRoot,
+      routes,
+      content,
       engineAssets,
-    );
-    const html = await theme.render(
-      route.layout,
-      locals,
-    );
-    await writeFileIfChanged(route.outputPath, html);
-    renderedPages.push({ route, html });
+      redirects: redirectArtifacts.redirects,
+      warnings: [...redirectArtifacts.warnings, ...warnings],
+      feeds: defaultFeedArtifacts(),
+      startedAt,
+      endedAt: new Date().toISOString(),
+    };
+
+    await plugins.run("build:done", { config, content, routes, result });
+    emitProgress("complete", `${result.routes.length} routes`);
+
+    return result;
+  } finally {
+    await theme.close();
   }
-
-  const redirectArtifacts = buildRedirectArtifacts(config, content, routes);
-  await writeRedirectOutputs(config, redirectArtifacts.redirects);
-
-  await writeFileIfChanged(
-    path.join(config.publicRoot, "sitemap.xml"),
-    buildSitemapXml(config, routes, content),
-  );
-  await writeFileIfChanged(
-    path.join(config.publicRoot, "robots.txt"),
-    buildRobotsTxt(config),
-  );
-  await writeFileIfChanged(
-    path.join(config.publicRoot, "feed.xml"),
-    buildRssXml(config, content),
-  );
-  await writeFileIfChanged(
-    path.join(config.publicRoot, "atom.xml"),
-    buildAtomXml(config, content),
-  );
-  if (redirectArtifacts.redirectsFile) {
-    await writeFileIfChanged(
-      path.join(config.publicRoot, "_redirects"),
-      redirectArtifacts.redirectsFile,
-    );
-  }
-
-  const warnings = await collectBuildWarnings({
-    config,
-    content,
-    routes,
-    redirects: redirectArtifacts.redirects,
-    renderedPages,
-  });
-
-  await theme.close();
-
-  const result: BuildResult = {
-    outputDir: config.publicRoot,
-    routes,
-    content,
-    engineAssets,
-    redirects: redirectArtifacts.redirects,
-    warnings: [...redirectArtifacts.warnings, ...warnings],
-    feeds: defaultFeedArtifacts(),
-    startedAt,
-    endedAt: new Date().toISOString(),
-  };
-
-  await plugins.run("build:done", { config, content, routes, result });
-
-  return result;
 }

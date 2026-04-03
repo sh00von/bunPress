@@ -1,0 +1,10 @@
+<footer class="journal-footer">
+  <div class="journal-shell journal-footer__inner">
+    <p class="journal-footer__copy">{{ site.title }} documents product and engineering decisions with simple, permanent publishing.</p>
+    {% if slots.site_footer.length %}
+      {% set items = slots.site_footer %}
+      {% set className = "slot-items slot-items--inline journal-footer__links" %}
+      {% include "slot-items.njk" %}
+    {% endif %}
+  </div>
+</footer>

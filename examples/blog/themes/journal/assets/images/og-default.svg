@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Journal theme social preview</title>
+  <desc id="desc">Minimal editorial journal presentation for BunPress.</desc>
+  <rect width="1200" height="630" fill="#edf4fb"/>
+  <rect x="72" y="72" width="1056" height="486" rx="18" fill="#f7fbff" stroke="#c9d8ea"/>
+  <text x="112" y="170" fill="#2f6fed" font-family="IBM Plex Mono, monospace" font-size="28" letter-spacing="10">JOURNAL</text>
+  <text x="112" y="286" fill="#132033" font-family="Georgia, serif" font-size="78">A readable theme for</text>
+  <text x="112" y="374" fill="#132033" font-family="Georgia, serif" font-size="78">developer writing</text>
+  <text x="112" y="470" fill="#5f728b" font-family="IBM Plex Mono, monospace" font-size="28">Narrow measure, cool tones, permanent notes.</text>
+</svg>

@@ -1,0 +1,15 @@
+<header class="magazine-header">
+  <div class="magazine-shell magazine-header__inner">
+    <div>
+      <p class="magazine-header__eyebrow">Modern editorial theme</p>
+      <a class="magazine-brand" href="{{ href('/', currentUrlPath) }}">{{ site.title }}</a>
+    </div>
+    <nav class="magazine-nav" aria-label="Primary">
+      {% if site.menus and site.menus.primary and site.menus.primary.length %}
+        {% for item in site.menus.primary %}
+          <a href="{{ href(item.url, currentUrlPath) }}">{{ item.text }}</a>
+        {% endfor %}
+      {% endif %}
+    </nav>
+  </div>
+</header>

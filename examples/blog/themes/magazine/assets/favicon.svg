@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Magazine theme favicon</title>
+  <rect width="64" height="64" rx="14" fill="#07111c"/>
+  <rect x="12" y="12" width="40" height="40" rx="8" fill="#102235"/>
+  <rect x="18" y="18" width="28" height="8" fill="#16b8d4"/>
+  <rect x="18" y="31" width="12" height="15" fill="#28425d"/>
+  <rect x="34" y="31" width="12" height="15" fill="#e8f2ff"/>
+</svg>

@@ -2,7 +2,7 @@ import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 import chokidar from "chokidar";
 import { Hono } from "hono";
-import type { DevServer } from "./types.ts";
+import type { BuildResult, BuildTrigger, DevServer, DevServerOptions } from "./types.ts";
 import { buildSite } from "./build.ts";
 import { loadConfig } from "./config.ts";
 
@@ -118,8 +118,26 @@ function createApp(
   return app;
 }
 
-export async function createDevServer(cwd: string): Promise<DevServer> {
-  await buildSite(cwd);
+export async function createDevServer(
+  cwd: string,
+  options: DevServerOptions = {},
+): Promise<DevServer> {
+  const runBuild = async (trigger: BuildTrigger): Promise<BuildResult> => {
+    try {
+      const result = await buildSite(cwd, {
+        onProgress: (event) => {
+          options.onBuildProgress?.({ ...event, trigger });
+        },
+      });
+      options.onBuildComplete?.(result, trigger);
+      return result;
+    } catch (error) {
+      options.onBuildError?.(error, trigger);
+      throw error;
+    }
+  };
+
+  await runBuild("initial");
   const config = await loadConfig(cwd);
   const subscribers = new Set<ReadableStreamDefaultController>();
 
@@ -134,14 +152,78 @@ export async function createDevServer(cwd: string): Promise<DevServer> {
     { ignoreInitial: true },
   );
 
+  let activeRebuild: Promise<BuildResult> | undefined;
+  let rebuildQueued = false;
+  let pendingResolvers: Array<{
+    resolve: (result: BuildResult) => void;
+    reject: (error: unknown) => void;
+  }> = [];
+
+  const flushPendingResolvers = (
+    result: { value: BuildResult } | { error: unknown },
+  ) => {
+    const resolvers = pendingResolvers;
+    pendingResolvers = [];
+    for (const resolver of resolvers) {
+      if ("error" in result) {
+        resolver.reject(result.error);
+      } else {
+        resolver.resolve(result.value);
+      }
+    }
+  };
+
   const rebuild = async () => {
-    const result = await buildSite(cwd);
-    notify();
-    return result;
+    rebuildQueued = true;
+    return await new Promise<BuildResult>((resolve, reject) => {
+      pendingResolvers.push({ resolve, reject });
+
+      if (activeRebuild) {
+        return;
+      }
+
+      activeRebuild = (async () => {
+        let lastResult: BuildResult | undefined;
+        let lastError: unknown;
+
+        try {
+          while (rebuildQueued) {
+            rebuildQueued = false;
+            try {
+              lastResult = await runBuild("rebuild");
+              lastError = undefined;
+              notify();
+            } catch (error) {
+              lastError = error;
+            }
+          }
+
+          if (lastError !== undefined) {
+            flushPendingResolvers({ error: lastError });
+            throw lastError;
+          }
+
+          if (!lastResult) {
+            throw new Error("Rebuild completed without producing output.");
+          }
+
+          flushPendingResolvers({ value: lastResult });
+          return lastResult;
+        } finally {
+          activeRebuild = undefined;
+        }
+      })();
+
+      void activeRebuild.catch(() => {
+        // watcher-triggered rebuild failures are reported via callbacks
+      });
+    });
   };
 
   const debouncedRebuild = debounce(() => {
-    void rebuild();
+    void rebuild().catch(() => {
+      // watcher-triggered rebuild failures are reported via callbacks
+    });
   }, 120);
 
   watcher.on("all", debouncedRebuild);

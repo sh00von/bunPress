@@ -1,0 +1,9 @@
+{% extends "base.njk" %}
+{% block content %}
+  <section class="journal-empty">
+    <p class="journal-kicker">404</p>
+    <h1 class="journal-title">Entry not found</h1>
+    <p class="journal-summary">The page you requested is not available in this journal.</p>
+    <a class="journal-card__link" href="{{ href('/', currentUrlPath) }}">Back to index</a>
+  </section>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.njk" %}
+{% block content %}
+  <section class="journal-hero journal-hero--compact">
+    <p class="journal-kicker">{{ page.taxonomyType | upper }}</p>
+    <h1 class="journal-title">{{ page.entry.name }}</h1>
+  </section>
+
+  <section class="journal-list" aria-label="{{ page.entry.name }}">
+    {% for post in page.entry.posts %}
+      <article class="journal-card journal-card--compact">
+        {% set items = slots.post_meta[post.id] or [] %}
+        {% set className = "journal-meta" %}
+        {% include "post-meta.njk" %}
+        <h2 class="journal-card__title"><a href="{{ href(post.urlPath, currentUrlPath) }}">{{ post.title }}</a></h2>
+        <p class="journal-card__excerpt">{{ post.excerpt }}</p>
+      </article>
+    {% endfor %}
+  </section>
+{% endblock %}

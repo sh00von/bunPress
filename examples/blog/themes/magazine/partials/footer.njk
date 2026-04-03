@@ -1,0 +1,13 @@
+<footer class="magazine-footer">
+  <div class="magazine-shell magazine-footer__inner">
+    <div>
+      <p class="magazine-section-label">From the desk</p>
+      <p class="magazine-footer__copy">{{ site.title }} is an editorial-style BunPress theme built to show stronger hierarchy, featured stories, and denser category browsing.</p>
+    </div>
+    {% if slots.site_footer.length %}
+      {% set items = slots.site_footer %}
+      {% set className = "slot-items slot-items--inline" %}
+      {% include "slot-items.njk" %}
+    {% endif %}
+  </div>
+</footer>

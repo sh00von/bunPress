@@ -1,0 +1,69 @@
+{% extends "base.njk" %}
+{% block content %}
+  <article class="magazine-entry">
+    <header class="magazine-entry__header">
+      <p class="magazine-eyebrow">Feature</p>
+      {% set items = slots.post_meta[page.post.id] or [] %}
+      {% set className = "magazine-meta magazine-meta--entry" %}
+      {% include "post-meta.njk" %}
+      <h1 class="magazine-entry__title">{{ page.post.title }}</h1>
+    </header>
+
+    {% if (slots.post_above_content[page.post.id] or []).length %}
+      {% set items = slots.post_above_content[page.post.id] or [] %}
+      {% set className = "slot-items slot-items--inline" %}
+      {% include "slot-items.njk" %}
+    {% endif %}
+
+    {% if page.post.frontMatter.image %}
+      <img class="magazine-entry__image" src="{{ page.post.frontMatter.image }}" alt="{{ page.post.frontMatter.imageAlt or page.post.title }}" />
+    {% endif %}
+
+    <div class="magazine-entry__content">
+      <div class="magazine-entry__body">{{ renderTrusted(page.post.html) }}</div>
+      <aside class="magazine-sidecar">
+        {% if page.post.tags.length %}
+          <section class="magazine-sidecar__section">
+            <p class="magazine-section-label">Tagged</p>
+            <div class="magazine-tags">
+              {% for tag in page.post.tags %}
+                <a class="magazine-tag" href="{{ href('/tags/' + (tag | lower | replace(' ', '-')) + '/', currentUrlPath) }}">{{ tag }}</a>
+              {% endfor %}
+            </div>
+          </section>
+        {% endif %}
+        {% if (slots.post_footer[page.post.id] or []).length %}
+          <section class="magazine-sidecar__section">
+            <p class="magazine-section-label">Share</p>
+            {% set items = slots.post_footer[page.post.id] or [] %}
+            {% set className = "slot-items slot-items--stack" %}
+            {% include "slot-items.njk" %}
+          </section>
+        {% endif %}
+      </aside>
+    </div>
+
+    {% if (slots.post_below_content[page.post.id] or []).length %}
+      {% set items = slots.post_below_content[page.post.id] or [] %}
+      {% set className = "slot-items slot-items--stack magazine-entry__after" %}
+      {% include "slot-items.njk" %}
+    {% endif %}
+
+    {% if page.adjacent and (page.adjacent.previous or page.adjacent.next) %}
+      <nav class="magazine-adjacent" aria-label="Adjacent posts">
+        <div class="magazine-adjacent__card">
+          {% if page.adjacent.previous %}
+            <p class="magazine-section-label">Previous</p>
+            <a class="magazine-link" href="{{ href(page.adjacent.previous.urlPath, currentUrlPath) }}">{{ page.adjacent.previous.title }}</a>
+          {% endif %}
+        </div>
+        <div class="magazine-adjacent__card magazine-adjacent__next">
+          {% if page.adjacent.next %}
+            <p class="magazine-section-label">Next</p>
+            <a class="magazine-link" href="{{ href(page.adjacent.next.urlPath, currentUrlPath) }}">{{ page.adjacent.next.title }}</a>
+          {% endif %}
+        </div>
+      </nav>
+    {% endif %}
+  </article>
+{% endblock %}

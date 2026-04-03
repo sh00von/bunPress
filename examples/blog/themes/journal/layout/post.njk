@@ -1,0 +1,57 @@
+{% extends "base.njk" %}
+{% block content %}
+  <article class="journal-entry">
+    <header class="journal-entry__header">
+      <p class="journal-kicker">Post</p>
+      {% set items = slots.post_meta[page.post.id] or [] %}
+      {% set className = "journal-meta journal-meta--entry" %}
+      {% include "post-meta.njk" %}
+      <h1 class="journal-entry__title">{{ page.post.title }}</h1>
+    </header>
+
+    {% if (slots.post_above_content[page.post.id] or []).length %}
+      {% set items = slots.post_above_content[page.post.id] or [] %}
+      {% set className = "slot-items slot-items--inline" %}
+      {% include "slot-items.njk" %}
+    {% endif %}
+
+    {% if page.post.tags.length %}
+      <div class="journal-tags">
+        {% for tag in page.post.tags %}
+          <a class="journal-tag" href="{{ href('/tags/' + (tag | lower | replace(' ', '-')) + '/', currentUrlPath) }}">#{{ tag }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="journal-entry__body">{{ renderTrusted(page.post.html) }}</div>
+
+    {% if (slots.post_below_content[page.post.id] or []).length %}
+      {% set items = slots.post_below_content[page.post.id] or [] %}
+      {% set className = "slot-items slot-items--stack" %}
+      {% include "slot-items.njk" %}
+    {% endif %}
+
+    {% if (slots.post_footer[page.post.id] or []).length %}
+      {% set items = slots.post_footer[page.post.id] or [] %}
+      {% set className = "slot-items slot-items--inline journal-entry__footer" %}
+      {% include "slot-items.njk" %}
+    {% endif %}
+
+    {% if page.adjacent and (page.adjacent.previous or page.adjacent.next) %}
+      <nav class="journal-adjacent" aria-label="Adjacent posts">
+        <div>
+          {% if page.adjacent.previous %}
+            <p class="journal-adjacent__label">Previous</p>
+            <a class="journal-adjacent__link" href="{{ href(page.adjacent.previous.urlPath, currentUrlPath) }}">{{ page.adjacent.previous.title }}</a>
+          {% endif %}
+        </div>
+        <div class="journal-adjacent__next">
+          {% if page.adjacent.next %}
+            <p class="journal-adjacent__label">Next</p>
+            <a class="journal-adjacent__link" href="{{ href(page.adjacent.next.urlPath, currentUrlPath) }}">{{ page.adjacent.next.title }}</a>
+          {% endif %}
+        </div>
+      </nav>
+    {% endif %}
+  </article>
+{% endblock %}

@@ -1,0 +1,12 @@
+<header class="journal-header">
+  <div class="journal-shell journal-header__inner">
+    <a class="journal-brand" href="{{ href('/', currentUrlPath) }}">{{ site.title }}</a>
+    <nav class="journal-nav" aria-label="Primary">
+      {% if site.menus and site.menus.primary and site.menus.primary.length %}
+        {% for item in site.menus.primary %}
+          <a href="{{ href(item.url, currentUrlPath) }}">{{ item.text }}</a>
+        {% endfor %}
+      {% endif %}
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,33 @@
+{% extends "base.njk" %}
+{% block content %}
+  <section class="journal-hero">
+    <p class="journal-kicker">Developer journal</p>
+    <h1 class="journal-title">{{ site.title }}</h1>
+    <p class="journal-summary">{{ site.description }}</p>
+  </section>
+
+  <section class="journal-list" aria-label="Posts">
+    {% for post in page.posts %}
+      <article class="journal-card">
+        <div class="journal-card__topline">
+          {% set entryNumber = loop.index + ((page.pagination.currentPage - 1) * page.pagination.pageSize) %}
+          <span class="journal-card__index">{% if entryNumber < 10 %}0{% endif %}{{ entryNumber }}</span>
+          {% set items = slots.post_meta[post.id] or [] %}
+          {% set className = "journal-meta" %}
+          {% include "post-meta.njk" %}
+        </div>
+        <h2 class="journal-card__title"><a href="{{ href(post.urlPath, currentUrlPath) }}">{{ post.title }}</a></h2>
+        <p class="journal-card__excerpt">{{ post.excerpt }}</p>
+        <a class="journal-card__link" href="{{ href(post.urlPath, currentUrlPath) }}">Open note</a>
+      </article>
+    {% endfor %}
+  </section>
+
+  {% if page.pagination.totalPages > 1 %}
+    <nav class="journal-pagination" aria-label="Pagination">
+      <a class="journal-pagination__link{% if not page.pagination.prevUrl %} is-disabled{% endif %}" href="{{ href(page.pagination.prevUrl or '#', currentUrlPath) }}">Newer</a>
+      <span class="journal-pagination__status">{{ page.pagination.currentPage }} / {{ page.pagination.totalPages }}</span>
+      <a class="journal-pagination__link{% if not page.pagination.nextUrl %} is-disabled{% endif %}" href="{{ href(page.pagination.nextUrl or '#', currentUrlPath) }}">Older</a>
+    </nav>
+  {% endif %}
+{% endblock %}

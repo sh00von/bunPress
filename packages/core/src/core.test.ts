@@ -486,9 +486,43 @@ See the [missing page](/does-not-exist/).
     expect(warningCodes).toContain("broken-internal-link");
   });
 
+  test("build emits ordered progress phases", async () => {
+    const siteRoot = await createFixtureSite();
+    const events: string[] = [];
+
+    await buildSite(siteRoot, {
+      onProgress: (event) => {
+        events.push(`${event.phaseId}:${event.phaseIndex}/${event.phaseCount}`);
+      },
+    });
+
+    const orderedPhases = events.filter((entry, index) => {
+      const phaseId = entry.split(":")[0];
+      const previousPhaseId = index > 0 ? events[index - 1]?.split(":")[0] : undefined;
+      return phaseId !== previousPhaseId;
+    });
+
+    expect(orderedPhases).toEqual([
+      "config:1/9",
+      "content:2/9",
+      "transform:3/9",
+      "routes:4/9",
+      "assets:5/9",
+      "render:6/9",
+      "artifacts:7/9",
+      "warnings:8/9",
+      "complete:9/9",
+    ]);
+  });
+
   test("dev server rebuilds on file change and static server serves built output", async () => {
     const siteRoot = await createFixtureSite();
-    const devServer = await createDevServer(siteRoot);
+    const devEvents: string[] = [];
+    const devServer = await createDevServer(siteRoot, {
+      onBuildProgress: (event) => {
+        devEvents.push(`${event.trigger}:${event.phaseId}`);
+      },
+    });
 
     try {
       let response = await devServer.fetch(new Request("http://localhost/"));
@@ -522,6 +556,10 @@ Changed content.
         expect(html).toContain("Archives");
       });
       expect(html).toContain("EventSource");
+      expect(devEvents).toContain("initial:config");
+      expect(devEvents).toContain("initial:complete");
+      expect(devEvents).toContain("rebuild:config");
+      expect(devEvents).toContain("rebuild:complete");
     } finally {
       await devServer.close();
     }

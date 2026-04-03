@@ -10,7 +10,7 @@ export default {
   // "plain" -> "/posts/:slug/"
   // "custom" -> use the explicit "permalink" field
   permalinkStyle: "post-name",
-  theme: "starter",
+  theme: "magazine",
   paginationSize: 5,
   redirects: {
     "/start/": "/about/",

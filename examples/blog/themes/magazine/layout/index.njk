@@ -1,0 +1,54 @@
+{% extends "base.njk" %}
+{% block content %}
+  {% set lead = page.posts[0] %}
+  {% if lead %}
+    <section class="magazine-hero">
+      <p class="magazine-eyebrow">Editorial dispatch</p>
+      <div class="magazine-hero__frame">
+        <article class="magazine-lead">
+          <p class="magazine-section-label">Featured story</p>
+          {% set items = slots.post_meta[lead.id] or [] %}
+          {% set className = "magazine-meta magazine-meta--lead" %}
+          {% include "post-meta.njk" %}
+          <h1 class="magazine-lead__title"><a href="{{ href(lead.urlPath, currentUrlPath) }}">{{ lead.title }}</a></h1>
+          <p class="magazine-lead__excerpt">{{ lead.excerpt }}</p>
+          <a class="magazine-link" href="{{ href(lead.urlPath, currentUrlPath) }}">Read feature</a>
+        </article>
+      </div>
+      <div class="magazine-intro">
+        <p class="magazine-intro__summary">{{ site.description }}</p>
+        <div class="magazine-intro__links">
+          {% if site.menus and site.menus.primary and site.menus.primary.length %}
+            {% for item in site.menus.primary %}
+              <a class="magazine-intro__link" href="{{ href(item.url, currentUrlPath) }}">{{ item.text }}</a>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </section>
+  {% endif %}
+
+  <section class="magazine-grid" aria-label="Posts">
+    {% for post in page.posts %}
+      {% if loop.index > 1 %}
+        <article class="magazine-card">
+          <p class="magazine-section-label">Dispatch {{ loop.index }}</p>
+          {% set items = slots.post_meta[post.id] or [] %}
+          {% set className = "magazine-meta" %}
+          {% include "post-meta.njk" %}
+          <h2 class="magazine-card__title"><a href="{{ href(post.urlPath, currentUrlPath) }}">{{ post.title }}</a></h2>
+          <p class="magazine-card__excerpt">{{ post.excerpt }}</p>
+          <a class="magazine-link" href="{{ href(post.urlPath, currentUrlPath) }}">Continue</a>
+        </article>
+      {% endif %}
+    {% endfor %}
+  </section>
+
+  {% if page.pagination.totalPages > 1 %}
+    <nav class="magazine-pagination" aria-label="Pagination">
+      <a class="magazine-pagination__link{% if not page.pagination.prevUrl %} is-disabled{% endif %}" href="{{ href(page.pagination.prevUrl or '#', currentUrlPath) }}">Newer stories</a>
+      <span class="magazine-pagination__status">Page {{ page.pagination.currentPage }} / {{ page.pagination.totalPages }}</span>
+      <a class="magazine-pagination__link{% if not page.pagination.nextUrl %} is-disabled{% endif %}" href="{{ href(page.pagination.nextUrl or '#', currentUrlPath) }}">Older stories</a>
+    </nav>
+  {% endif %}
+{% endblock %}

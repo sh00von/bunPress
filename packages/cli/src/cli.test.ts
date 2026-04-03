@@ -3,7 +3,9 @@ import { access, mkdtemp, mkdir, readFile, readdir, rm, writeFile } from "node:f
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeAll, describe, expect, test } from "bun:test";
+import type { BuildProgressEvent } from "@bunpress/core";
 import { run } from "./run.ts";
+import { BuildProgressRenderer } from "./progress.ts";
 
 const tempDirs: string[] = [];
 const builtCliPath = path.resolve(import.meta.dir, "../dist/bunpress.js");
@@ -66,20 +68,6 @@ async function runBunCommand(cwd: string, ...args: string[]) {
   return await runProcess(runtimeExecutable, args, cwd);
 }
 
-async function pointSiteAtLocalPackage(siteRoot: string) {
-  const packageJsonPath = path.join(siteRoot, "package.json");
-  const packageJson = JSON.parse(await readFile(packageJsonPath, "utf8")) as {
-    devDependencies?: Record<string, string>;
-  };
-
-  packageJson.devDependencies = {
-    ...(packageJson.devDependencies ?? {}),
-    "bunpress-kit": `file:${path.resolve(import.meta.dir, "..")}`,
-  };
-
-  await writeFile(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`, "utf8");
-}
-
 async function captureConsole(
   callback: () => Promise<number>,
   kind: "log" | "error",
@@ -96,6 +84,16 @@ async function captureConsole(
   } finally {
     console[kind] = original;
   }
+}
+
+function createProgressEvent(overrides: Partial<BuildProgressEvent> = {}): BuildProgressEvent {
+  return {
+    phaseId: "content",
+    phaseLabel: "Load content",
+    phaseIndex: 2,
+    phaseCount: 9,
+    ...overrides,
+  };
 }
 
 beforeAll(async () => {
@@ -228,11 +226,8 @@ describe("cli", () => {
       expect(await run(["new", "draft", "Queued Thoughts"])).toBe(0);
     });
 
-    await pointSiteAtLocalPackage(siteRoot);
-    const installResult = await runBunCommand(siteRoot, "install");
     const buildResult = await runBunCommand(siteRoot, builtCliPath, "build");
 
-    expect(installResult.exitCode).toBe(0);
     expect(buildResult.exitCode).toBe(0);
 
     const builtIndex = await readFile(path.join(siteRoot, "public/index.html"), "utf8");
@@ -245,6 +240,47 @@ describe("cli", () => {
     expect(builtFeed).toContain("<rss version=\"2.0\">");
     expect(builtAtom).toContain("<feed xmlns=\"http://www.w3.org/2005/Atom\">");
     expect(builtRedirect).toContain("Redirecting to");
+  });
+
+  test("build command emits progress logs before the final summary in non-tty mode", async () => {
+    const siteRoot = await mkdtemp(path.join(os.tmpdir(), "bunpress-cli-progress-"));
+    tempDirs.push(siteRoot);
+
+    await withCwd(siteRoot, async () => {
+      expect(await run(["init", "."])).toBe(0);
+      expect(await run(["new", "post", "CLI Generated"])).toBe(0);
+      const result = await captureConsole(async () => await run(["build"]), "log");
+      const output = result.messages.join("\n");
+
+      expect(result.exitCode).toBe(0);
+      expect(output).toContain("[bunpress:build] 1/9 Load config");
+      expect(output).toContain("[bunpress:build] 9/9 Complete");
+      expect(output).toContain("Build completed (");
+      expect(output).toContain("Built ");
+      expect(output).not.toContain("\x1b[42m");
+    });
+  });
+
+  test("interactive progress renderer uses green ansi block cells", () => {
+    let written = "";
+    const stream = {
+      isTTY: true,
+      write(chunk: string) {
+        written += chunk;
+        return true;
+      },
+    } as unknown as NodeJS.WriteStream;
+    const renderer = new BuildProgressRenderer("[bunpress:build]", {
+      stream,
+      isTTY: true,
+    });
+
+    renderer.update(createProgressEvent());
+
+    expect(written).toContain("\r[bunpress:build] [");
+    expect(written).toContain("\x1b[42m  \x1b[0m");
+    expect(written).toContain("\x1b[47m\x1b[90m  \x1b[0m");
+    expect(written).toContain(" 11% Load content");
   });
 
   test("clean removes generated output only", async () => {

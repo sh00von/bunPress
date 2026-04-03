@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="{{ site.language }}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ seo.title }}</title>
+    <meta name="description" content="{{ seo.description }}" />
+    <link rel="canonical" href="{{ seo.canonical }}" />
+    <meta name="robots" content="{{ seo.robots }}" />
+    {% if seo.themeColor %}
+      <meta name="theme-color" content="{{ seo.themeColor }}" />
+    {% endif %}
+    {% for favicon in seo.favicons %}
+      <link rel="{{ favicon.rel }}" href="{{ favicon.url }}"{% if favicon.type %} type="{{ favicon.type }}"{% endif %}{% if favicon.sizes %} sizes="{{ favicon.sizes }}"{% endif %}{% if favicon.color %} color="{{ favicon.color }}"{% endif %} />
+    {% endfor %}
+    <meta property="og:title" content="{{ seo.openGraph.title }}" />
+    <meta property="og:description" content="{{ seo.openGraph.description }}" />
+    <meta property="og:type" content="{{ seo.openGraph.type }}" />
+    <meta property="og:url" content="{{ seo.openGraph.url }}" />
+    <meta property="og:site_name" content="{{ seo.openGraph.siteName }}" />
+    {% if seo.openGraph.image %}
+      <meta property="og:image" content="{{ seo.openGraph.image }}" />
+    {% endif %}
+    {% if seo.openGraph.imageAlt %}
+      <meta property="og:image:alt" content="{{ seo.openGraph.imageAlt }}" />
+    {% endif %}
+    <meta name="twitter:card" content="{{ seo.twitter.card }}" />
+    <meta name="twitter:title" content="{{ seo.twitter.title }}" />
+    <meta name="twitter:description" content="{{ seo.twitter.description }}" />
+    {% if seo.twitter.image %}
+      <meta name="twitter:image" content="{{ seo.twitter.image }}" />
+    {% endif %}
+    <link rel="alternate" type="application/rss+xml" title="{{ site.title }} RSS" href="{{ href(feeds.rssPath, currentUrlPath) }}" />
+    <link rel="alternate" type="application/atom+xml" title="{{ site.title }} Atom" href="{{ href(feeds.atomPath, currentUrlPath) }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Literata:opsz,wght@7..72,400..700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ href('/assets/css/site.css', currentUrlPath) }}" />
+    {% for schema in seo.jsonLd %}
+      <script type="application/ld+json">{{ renderTrusted(json(schema)) }}</script>
+    {% endfor %}
+  </head>
+  <body class="journal-body">
+    {% include "header.njk" %}
+    <main class="journal-shell">
+      {% include "breadcrumbs.njk" %}
+      {% block content %}{% endblock %}
+    </main>
+    {% include "footer.njk" %}
+  </body>
+</html>

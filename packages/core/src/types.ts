@@ -273,6 +273,29 @@ export interface BuildResult {
   endedAt: string;
 }
 
+export type BuildPhaseId =
+  | "config"
+  | "content"
+  | "transform"
+  | "routes"
+  | "assets"
+  | "render"
+  | "artifacts"
+  | "warnings"
+  | "complete";
+
+export interface BuildProgressEvent {
+  phaseId: BuildPhaseId;
+  phaseLabel: string;
+  phaseIndex: number;
+  phaseCount: number;
+  detail?: string;
+}
+
+export interface BuildOptions {
+  onProgress?: (event: BuildProgressEvent) => void;
+}
+
 export interface BuildWarning {
   code: string;
   message: string;
@@ -435,4 +458,14 @@ export interface DevServer {
   fetch: (request: Request) => Response | Promise<Response>;
   close: () => Promise<void>;
   rebuild: () => Promise<BuildResult>;
+}
+
+export type BuildTrigger = "initial" | "rebuild";
+
+export interface DevServerOptions {
+  onBuildProgress?: (
+    event: BuildProgressEvent & { trigger: BuildTrigger },
+  ) => void;
+  onBuildComplete?: (result: BuildResult, trigger: BuildTrigger) => void;
+  onBuildError?: (error: unknown, trigger: BuildTrigger) => void;
 }

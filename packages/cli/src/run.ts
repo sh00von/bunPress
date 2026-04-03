@@ -7,6 +7,7 @@ import { serve } from "@hono/node-server";
 import { buildSite, cleanSite, loadConfig, loadContent, type GitHubDeployConfig, type VercelDeployConfig } from "@bunpress/core";
 import { createDevServer, createStaticServer } from "@bunpress/dev-server";
 import { ensureEmptyOrMissing, scaffoldPlugin, scaffoldSite, scaffoldTheme } from "./scaffold.ts";
+import { BuildProgressManager, BuildProgressRenderer } from "./progress.ts";
 
 type ContentKind = "post" | "page" | "draft";
 
@@ -182,9 +183,14 @@ async function commandExists(command: string): Promise<boolean> {
 }
 
 async function runServer(commandName: "dev" | "serve", cwd: string, port: number) {
+  const progressManager = commandName === "dev" ? new BuildProgressManager() : undefined;
   const server =
     commandName === "dev"
-      ? await createDevServer(cwd)
+      ? await createDevServer(cwd, {
+          onBuildProgress: (event) => progressManager?.onProgress(event),
+          onBuildComplete: (result, trigger) => progressManager?.onComplete(result, trigger),
+          onBuildError: (error, trigger) => progressManager?.onError(error, trigger),
+        })
       : await createStaticServer(cwd);
 
   const instance = serve({
@@ -395,7 +401,18 @@ export async function run(argv: string[]): Promise<number> {
     .command("build")
     .alias("generate")
     .action(async () => {
-      const result = await buildSite(process.cwd());
+      const progress = new BuildProgressRenderer("[bunpress:build]");
+      let result;
+      try {
+        result = await buildSite(process.cwd(), {
+          onProgress: (event) => progress.update(event),
+        });
+      } catch (error) {
+        progress.abort();
+        throw error;
+      }
+
+      progress.complete(`Build completed (${result.routes.length} routes)`);
       printBuildWarnings(result.warnings);
       console.log(`Built ${result.routes.length} routes into ${result.outputDir}`);
     });

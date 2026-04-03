@@ -1,0 +1,29 @@
+{% set metaItems = items or [] %}
+{% if metaItems.length %}
+  <p class="{{ className or 'magazine-meta' }}">
+    {% for item in metaItems %}
+      {% if not loop.first %}
+        <span class="magazine-meta__dot">/</span>
+      {% endif %}
+      {% if item.kind == "button" %}
+        <a
+          class="{{ item.className or itemClassName or 'magazine-tag' }}"
+          href="{{ href(item.url or '#', currentUrlPath) }}"
+          {% if item.title %}title="{{ item.title }}"{% endif %}
+          {% if item.rel %}rel="{{ item.rel }}"{% endif %}
+          {% if item.target %}target="{{ item.target }}"{% endif %}
+        >{{ item.text }}</a>
+      {% elif item.kind == "link" or item.url %}
+        <a
+          class="{{ item.className or itemClassName or '' }}"
+          href="{{ href(item.url or '#', currentUrlPath) }}"
+          {% if item.title %}title="{{ item.title }}"{% endif %}
+          {% if item.rel %}rel="{{ item.rel }}"{% endif %}
+          {% if item.target %}target="{{ item.target }}"{% endif %}
+        >{{ item.text }}</a>
+      {% else %}
+        <span class="{{ item.className or itemClassName or '' }}">{{ item.text }}</span>
+      {% endif %}
+    {% endfor %}
+  </p>
+{% endif %}

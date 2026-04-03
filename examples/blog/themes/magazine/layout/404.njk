@@ -1,0 +1,9 @@
+{% extends "base.njk" %}
+{% block content %}
+  <section class="magazine-heading magazine-heading--empty">
+    <p class="magazine-eyebrow">404</p>
+    <h1 class="magazine-entry__title">Edition unavailable</h1>
+    <p class="magazine-lead__excerpt">This page is not part of the current issue.</p>
+    <a class="magazine-link" href="{{ href('/', currentUrlPath) }}">Return home</a>
+  </section>
+{% endblock %}

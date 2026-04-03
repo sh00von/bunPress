@@ -1,0 +1,19 @@
+{% extends "base.njk" %}
+{% block content %}
+  <section class="magazine-heading">
+    <p class="magazine-eyebrow">{{ page.taxonomyType | upper }}</p>
+    <h1 class="magazine-entry__title">{{ page.entry.name }}</h1>
+  </section>
+
+  <section class="magazine-grid" aria-label="{{ page.entry.name }}">
+    {% for post in page.entry.posts %}
+      <article class="magazine-card">
+        {% set items = slots.post_meta[post.id] or [] %}
+        {% set className = "magazine-meta" %}
+        {% include "post-meta.njk" %}
+        <h2 class="magazine-card__title"><a href="{{ href(post.urlPath, currentUrlPath) }}">{{ post.title }}</a></h2>
+        <p class="magazine-card__excerpt">{{ post.excerpt }}</p>
+      </article>
+    {% endfor %}
+  </section>
+{% endblock %}

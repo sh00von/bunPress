@@ -1,0 +1,25 @@
+{% extends "base.njk" %}
+{% block content %}
+  <section class="journal-hero journal-hero--compact">
+    <p class="journal-kicker">Archive</p>
+    <h1 class="journal-title">{{ page.title }}</h1>
+  </section>
+
+  <div class="journal-groups">
+    {% for group in page.archives %}
+      <section class="journal-group">
+        <h2 class="journal-group__title">{{ group.label }}</h2>
+        <div class="journal-group__items">
+          {% for post in group.posts %}
+            <article class="journal-card journal-card--compact">
+              {% set items = slots.post_meta[post.id] or [] %}
+              {% set className = "journal-meta" %}
+              {% include "post-meta.njk" %}
+              <h3 class="journal-card__title"><a href="{{ href(post.urlPath, currentUrlPath) }}">{{ post.title }}</a></h3>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+    {% endfor %}
+  </div>
+{% endblock %}
