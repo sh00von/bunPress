@@ -2,7 +2,10 @@
 title: Building a publishing system for product and engineering teams
 slug: hello-bunpress
 date: 2026-03-31T10:00:00.000Z
+description: Why BunPress is designed for teams that need clear product and engineering communication.
 author: BunPress Team
+aliases:
+  - /hello-bun-hexo-clone/
 tags:
   - platform
   - bun

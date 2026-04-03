@@ -43,16 +43,26 @@ Do not build sites, themes, or plugins from untrusted sources unless you are com
 
 ## Documentation
 
-- [Getting Started](D:\work\hexo-clone-node\docs\getting-started.md)
-- [Site Structure](D:\work\hexo-clone-node\docs\site-structure.md)
-- [SEO Overview](D:\work\hexo-clone-node\docs\seo\overview.md)
-- [SEO Metadata and Schema](D:\work\hexo-clone-node\docs\seo\metadata-and-schema.md)
-- [Theme Overview](D:\work\hexo-clone-node\docs\themes\overview.md)
-- [Templates and Locals](D:\work\hexo-clone-node\docs\themes\templates-and-locals.md)
-- [Plugin Overview](D:\work\hexo-clone-node\docs\plugins\overview.md)
-- [Plugin Slots](D:\work\hexo-clone-node\docs\plugins\slots.md)
-- [Plugin Examples](D:\work\hexo-clone-node\docs\plugins\examples.md)
-- [Stability Reference](D:\work\hexo-clone-node\docs\reference\stability.md)
+- [Getting Started](./my-docs-website/docs/getting-started.md)
+- [Feature Overview](./my-docs-website/docs/features.md)
+- [CLI Reference](./my-docs-website/docs/cli-reference.md)
+- [Site Structure](./my-docs-website/docs/site-structure.md)
+- [Publishing Quality](./my-docs-website/docs/publishing-quality.md)
+- [SEO Overview](./my-docs-website/docs/seo/overview.md)
+- [SEO Metadata and Schema](./my-docs-website/docs/seo/metadata-and-schema.md)
+- [Theme Overview](./my-docs-website/docs/themes/overview.md)
+- [Templates and Locals](./my-docs-website/docs/themes/templates-and-locals.md)
+- [Plugin Overview](./my-docs-website/docs/plugins/overview.md)
+- [Plugin Slots](./my-docs-website/docs/plugins/slots.md)
+- [Plugin Examples](./my-docs-website/docs/plugins/examples.md)
+- [Core API](./my-docs-website/docs/developers/core-api.md)
+- [Stability Reference](./my-docs-website/docs/reference/stability.md)
+
+Run the docs site locally with:
+
+```bash
+bun run docs:dev
+```
 
 ## Official Contract
 

@@ -19,6 +19,7 @@ export interface SiteConfigInput {
   publicDir?: string;
   themesDir?: string;
   plugins?: string[];
+  redirects?: Record<string, string>;
   deploy?: DeployConfigInput;
   socialLinks?: SocialLinkConfigItem[];
   menus?: SiteMenuConfig;
@@ -151,6 +152,7 @@ export interface FrontMatter {
   image?: string;
   imageAlt?: string;
   canonical?: string;
+  aliases?: string | string[];
   noindex?: boolean;
   nofollow?: boolean;
   draft?: boolean;
@@ -177,6 +179,7 @@ export interface ContentBase {
   html: TrustedHtml;
   layout: string;
   frontMatter: FrontMatter;
+  aliases: string[];
   date?: string;
   updated?: string;
   tags: string[];
@@ -209,12 +212,26 @@ export interface ArchiveGroup {
   posts: Post[];
 }
 
+export interface AdjacentPostLink {
+  id: string;
+  title: string;
+  urlPath: string;
+  permalink: string;
+  date?: string;
+}
+
+export interface AdjacentPostLinks {
+  previous?: AdjacentPostLink;
+  next?: AdjacentPostLink;
+}
+
 export interface ContentGraph {
   posts: Post[];
   pages: Page[];
   tags: TaxonomyEntry[];
   categories: TaxonomyEntry[];
   archives: ArchiveGroup[];
+  adjacentPosts: Record<string, AdjacentPostLinks>;
 }
 
 export type RouteKind =
@@ -249,8 +266,30 @@ export interface BuildResult {
   routes: RouteManifestEntry[];
   content: ContentGraph;
   engineAssets: Record<string, string>;
+  redirects: RedirectEntry[];
+  warnings: BuildWarning[];
+  feeds: FeedArtifacts;
   startedAt: string;
   endedAt: string;
+}
+
+export interface BuildWarning {
+  code: string;
+  message: string;
+  sourcePath?: string;
+  urlPath?: string;
+}
+
+export interface RedirectEntry {
+  sourcePath: string;
+  target: string;
+  outputPath: string;
+  reason: "alias" | "config";
+}
+
+export interface FeedArtifacts {
+  rssPath: string;
+  atomPath: string;
 }
 
 export interface SeoBreadcrumbItem {

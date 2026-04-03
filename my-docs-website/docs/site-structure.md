@@ -64,6 +64,9 @@ export default {
   permalinkStyle: "day-and-name",
   theme: "starter",
   paginationSize: 5,
+  redirects: {
+    "/start/": "/about/",
+  },
   seo: {
     siteName: "Platform Briefing",
     defaultDescription: "A Bun-first publishing system for product, platform, and engineering communication.",
@@ -111,6 +114,7 @@ Built-in SEO front matter overrides:
 - `image`
 - `imageAlt`
 - `canonical`
+- `aliases`
 - `noindex`
 - `nofollow`
 
@@ -123,13 +127,13 @@ Stores local themes. A theme usually contains:
 - `assets/`
 - optional `theme.config.ts`
 
-See [Theme Overview](D:\work\hexo-clone-node\docs\themes\overview.md).
+See [Theme Overview](./themes/overview.md).
 
 ## `plugins/`
 
 Stores local plugins that are explicitly enabled in `site.config.ts`.
 
-See [Plugin Overview](D:\work\hexo-clone-node\docs\plugins\overview.md).
+See [Plugin Overview](./plugins/overview.md).
 
 ## `scaffolds/`
 

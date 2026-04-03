@@ -102,7 +102,8 @@ vercel link
 
 ## Read Next
 
-- [Site Structure](D:\work\hexo-clone-node\docs\site-structure.md)
-- [SEO Overview](D:\work\hexo-clone-node\docs\seo\overview.md)
-- [Theme Overview](D:\work\hexo-clone-node\docs\themes\overview.md)
-- [Plugin Overview](D:\work\hexo-clone-node\docs\plugins\overview.md)
+- [Site Structure](./site-structure.md)
+- [Feature Overview](./features.md)
+- [SEO Overview](./seo/overview.md)
+- [Theme Overview](./themes/overview.md)
+- [Plugin Overview](./plugins/overview.md)

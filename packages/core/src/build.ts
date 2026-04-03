@@ -20,6 +20,14 @@ import {
   resolveThemeConfig,
 } from "./theme.ts";
 import { buildRobotsTxt, buildSitemapXml, resolveSeo } from "./seo.ts";
+import {
+  buildAtomXml,
+  buildRedirectArtifacts,
+  buildRssXml,
+  collectBuildWarnings,
+  defaultFeedArtifacts,
+  writeRedirectOutputs,
+} from "./publishing.ts";
 import { toRelativeHref, writeFileIfChanged } from "./utils.ts";
 
 type SlotMap = Record<ThemeSlotName, Record<string, ThemeSlotItem[]> | ThemeSlotItem[]>;
@@ -162,6 +170,7 @@ async function renderLocals(
 ) {
   const slots = await resolveSlots(config, content, route, plugins);
   const seo = resolveSeo({ config, content, route });
+  const feeds = defaultFeedArtifacts();
   const themeSeo = {
     ...seo,
     breadcrumbsRelative: seo.breadcrumbs.map((item) => {
@@ -186,6 +195,7 @@ async function renderLocals(
     seo: themeSeo,
     routes,
     engineAssets,
+    feeds,
     slots,
     collections: {
       posts: content.posts,
@@ -228,6 +238,7 @@ export async function buildSite(cwd: string): Promise<BuildResult> {
 
   const theme = await createThemeAdapter({ config, helpers });
   const engineAssets: Record<string, string> = {};
+  const renderedPages: Array<{ route: RouteManifestEntry; html: string }> = [];
 
   for (const route of routes) {
     const locals = await renderLocals(
@@ -243,7 +254,11 @@ export async function buildSite(cwd: string): Promise<BuildResult> {
       locals,
     );
     await writeFileIfChanged(route.outputPath, html);
+    renderedPages.push({ route, html });
   }
+
+  const redirectArtifacts = buildRedirectArtifacts(config, content, routes);
+  await writeRedirectOutputs(config, redirectArtifacts.redirects);
 
   await writeFileIfChanged(
     path.join(config.publicRoot, "sitemap.xml"),
@@ -253,6 +268,28 @@ export async function buildSite(cwd: string): Promise<BuildResult> {
     path.join(config.publicRoot, "robots.txt"),
     buildRobotsTxt(config),
   );
+  await writeFileIfChanged(
+    path.join(config.publicRoot, "feed.xml"),
+    buildRssXml(config, content),
+  );
+  await writeFileIfChanged(
+    path.join(config.publicRoot, "atom.xml"),
+    buildAtomXml(config, content),
+  );
+  if (redirectArtifacts.redirectsFile) {
+    await writeFileIfChanged(
+      path.join(config.publicRoot, "_redirects"),
+      redirectArtifacts.redirectsFile,
+    );
+  }
+
+  const warnings = await collectBuildWarnings({
+    config,
+    content,
+    routes,
+    redirects: redirectArtifacts.redirects,
+    renderedPages,
+  });
 
   await theme.close();
 
@@ -261,6 +298,9 @@ export async function buildSite(cwd: string): Promise<BuildResult> {
     routes,
     content,
     engineAssets,
+    redirects: redirectArtifacts.redirects,
+    warnings: [...redirectArtifacts.warnings, ...warnings],
+    feeds: defaultFeedArtifacts(),
     startedAt,
     endedAt: new Date().toISOString(),
   };

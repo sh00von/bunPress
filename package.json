@@ -13,8 +13,11 @@
     "build": "bun run build:cli && bun run build:create",
     "build:cli": "bun --cwd packages/cli run build",
     "build:create": "bun --cwd packages/create run build",
+    "build:docs": "npm --prefix my-docs-website run build",
     "lint": "bunx tsc --noEmit",
     "test": "bun test",
+    "docs:dev": "npm --prefix my-docs-website run dev",
+    "docs:serve": "npm --prefix my-docs-website run serve",
     "build:example": "bun --cwd examples/blog run build",
     "dev:example": "bun --cwd examples/blog run dev",
     "serve:example": "bun --cwd examples/blog run serve"

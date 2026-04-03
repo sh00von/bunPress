@@ -83,9 +83,9 @@ The starter theme renders:
 - `page_above_content` on standalone pages
 - `page_below_content` on standalone pages
 - `page_footer` on standalone pages
-- `site_header` in the main header
-- `sidebar_primary` in the optional page sidebar
 - `site_footer` in the footer area
+
+The starter theme does not render `site_header` or `sidebar_primary` by default. Those slots remain available for custom themes that intentionally expose header or sidebar extension areas.
 
 This means a plugin that contributes a `post_meta` item automatically appears in those views.
 

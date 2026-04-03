@@ -14,6 +14,20 @@ interface CreateContentOptions {
   scaffold?: string;
 }
 
+function printBuildWarnings(
+  warnings: Array<{ code: string; message: string; sourcePath?: string; urlPath?: string }>,
+) {
+  if (!warnings.length) {
+    return;
+  }
+
+  console.warn(`Warnings (${warnings.length})`);
+  for (const warning of warnings) {
+    const location = warning.sourcePath || warning.urlPath;
+    console.warn(`- [${warning.code}] ${warning.message}${location ? ` (${location})` : ""}`);
+  }
+}
+
 function slugify(value: string): string {
   return value
     .toLowerCase()
@@ -239,6 +253,7 @@ async function publishGitHub(
   const repo = await resolveGitHubRepo(cwd, deploy.repo);
   const branch = deploy.branch?.trim() || "gh-pages";
   const result = await buildSite(cwd);
+  printBuildWarnings(result.warnings);
 
   if (override.dryRun) {
     console.log(`[dry-run] GitHub publish is configured for ${repo}#${branch}`);
@@ -290,6 +305,7 @@ async function publishVercel(
     ...override,
   };
   const result = await buildSite(cwd);
+  printBuildWarnings(result.warnings);
   const args = ["deploy", result.outputDir, "--yes"];
 
   if (deploy.prod ?? true) {
@@ -380,6 +396,7 @@ export async function run(argv: string[]): Promise<number> {
     .alias("generate")
     .action(async () => {
       const result = await buildSite(process.cwd());
+      printBuildWarnings(result.warnings);
       console.log(`Built ${result.routes.length} routes into ${result.outputDir}`);
     });
 

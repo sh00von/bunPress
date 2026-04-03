@@ -3,7 +3,7 @@ import path from "node:path";
 import { createJiti } from "jiti";
 import type { SiteConfig, SiteConfigInput } from "./types.ts";
 import { sanitizeUrl } from "./security.ts";
-import { ensureLeadingSlash, trimSlashes } from "./utils.ts";
+import { ensureLeadingSlash, normalizeUrlPath, trimSlashes } from "./utils.ts";
 
 const DEFAULTS: Omit<
   SiteConfig,
@@ -41,6 +41,7 @@ const DEFAULTS: Omit<
     primary: [],
     footer: [],
   },
+  redirects: {},
   deploy: {},
   pluginsConfig: {},
   seo: {
@@ -130,6 +131,20 @@ function sanitizeSocialLinks(
   }));
 }
 
+function sanitizeRedirects(entries: SiteConfigInput["redirects"]) {
+  return Object.fromEntries(
+    Object.entries(entries ?? {}).map(([source, target]) => [
+      normalizeUrlPath(source),
+      sanitizeUrl(target, {
+        allowedSchemes: ["http", "https"],
+        allowRelative: true,
+        allowFragment: false,
+        fieldName: `redirects["${source}"]`,
+      }),
+    ]),
+  );
+}
+
 export async function loadConfig(cwd: string): Promise<SiteConfig> {
   const rootDir = path.resolve(cwd);
   const configPath = await resolveConfigPath(rootDir);
@@ -193,6 +208,7 @@ export async function loadConfig(cwd: string): Promise<SiteConfig> {
       path.resolve(rootDir, pluginPath),
     ),
     socialLinks: sanitizeSocialLinks(input.socialLinks),
+    redirects: sanitizeRedirects(input.redirects),
     menus: {
       primary: sanitizeMenuEntries(input.menus?.primary, "menus.primary"),
       footer: sanitizeMenuEntries(input.menus?.footer, "menus.footer"),

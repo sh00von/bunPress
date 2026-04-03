@@ -1,0 +1,13 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#F7F7F5"/>
+  <rect x="56" y="56" width="1088" height="518" rx="28" fill="white" stroke="#E6E6E1"/>
+  <rect x="96" y="96" width="78" height="78" rx="18" fill="#111111"/>
+  <path d="M117 112H136C147.046 112 156 120.954 156 132C156 143.046 147.046 152 136 152H117V112Z" fill="white"/>
+  <path d="M127 123H136C140.971 123 145 127.029 145 132C145 136.971 140.971 141 136 141H127V123Z" fill="#111111"/>
+  <text x="198" y="129" fill="#111111" font-family="Work Sans, Segoe UI, sans-serif" font-size="36" font-weight="700">BunPress Docs</text>
+  <text x="198" y="170" fill="#525252" font-family="Work Sans, Segoe UI, sans-serif" font-size="22">Bun-first publishing for docs, blogs, and product communication.</text>
+  <text x="96" y="290" fill="#111111" font-family="Work Sans, Segoe UI, sans-serif" font-size="76" font-weight="700">Build docs, blogs,</text>
+  <text x="96" y="372" fill="#111111" font-family="Work Sans, Segoe UI, sans-serif" font-size="76" font-weight="700">themes, plugins,</text>
+  <text x="96" y="454" fill="#111111" font-family="Work Sans, Segoe UI, sans-serif" font-size="76" font-weight="700">and publishing flows.</text>
+  <text x="96" y="529" fill="#606060" font-family="Work Sans, Segoe UI, sans-serif" font-size="28">CLI, SEO, themes, plugins, publishing quality, and developer APIs.</text>
+</svg>

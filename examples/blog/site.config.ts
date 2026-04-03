@@ -12,6 +12,9 @@ export default {
   permalinkStyle: "post-name",
   theme: "starter",
   paginationSize: 5,
+  redirects: {
+    "/start/": "/about/",
+  },
   seo: {
     siteName: "Platform Briefing",
     defaultDescription: "A Bun-first publishing system for product, platform, and engineering communication.",

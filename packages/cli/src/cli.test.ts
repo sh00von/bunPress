@@ -236,9 +236,15 @@ describe("cli", () => {
     expect(buildResult.exitCode).toBe(0);
 
     const builtIndex = await readFile(path.join(siteRoot, "public/index.html"), "utf8");
+    const builtFeed = await readFile(path.join(siteRoot, "public/feed.xml"), "utf8");
+    const builtAtom = await readFile(path.join(siteRoot, "public/atom.xml"), "utf8");
+    const builtRedirect = await readFile(path.join(siteRoot, "public/start/index.html"), "utf8");
 
     expect(builtIndex).toContain("Platform Briefing");
     expect(builtIndex).not.toContain("Queued Thoughts");
+    expect(builtFeed).toContain("<rss version=\"2.0\">");
+    expect(builtAtom).toContain("<feed xmlns=\"http://www.w3.org/2005/Atom\">");
+    expect(builtRedirect).toContain("Redirecting to");
   });
 
   test("clean removes generated output only", async () => {

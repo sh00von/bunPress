@@ -103,4 +103,4 @@ For blog-focused plugins, the most useful stable slots are:
 - `sidebar_primary`
 - `site_footer`
 
-See [Plugin Slots](D:\work\hexo-clone-node\docs\plugins\slots.md).
+See [Plugin Slots](./slots.md).

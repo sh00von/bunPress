@@ -54,6 +54,9 @@ async function createFixtureSite(): Promise<string> {
   theme: "starter",
   permalink: "/:year/:month/:day/:slug/",
   paginationSize: 1,
+  redirects: {
+    "/legacy-guides/": "/second-post/",
+  },
   plugins: ["./plugins/tracker.ts", "./plugins/badge.ts"],
 };
 `,
@@ -102,6 +105,9 @@ export default async function tracker(api) {
       `---
 title: Hello World
 date: 2026-03-29T10:00:00.000Z
+description: First post description
+aliases:
+  - /legacy-hello/
 tags: [intro, bun]
 categories: [guides]
 ---
@@ -118,6 +124,7 @@ More body text.
       `---
 title: Another Post
 date: 2026-03-30T10:00:00.000Z
+description: Second post description
 tags: [updates]
 categories: [guides]
 ---
@@ -131,6 +138,8 @@ Second post body.
 title: About
 description: About fixture page
 noindex: true
+aliases:
+  - /company/
 ---
 
 About body.
@@ -172,7 +181,7 @@ About body.
       "themes/starter/layout/post.njk",
       `{% extends "base.njk" %}
 {% block content %}
-<article><h1>{{ page.post.title }}</h1><p>{% for item in slots.post_meta[page.post.id] %}{{ item.text }}{% if not loop.last %}|{% endif %}{% endfor %}</p>{{ renderTrusted(page.post.html) }}</article>
+<article><h1>{{ page.post.title }}</h1><p>{% for item in slots.post_meta[page.post.id] %}{{ item.text }}{% if not loop.last %}|{% endif %}{% endfor %}</p>{{ renderTrusted(page.post.html) }}{% if page.adjacent.previous %}<a href="{{ page.adjacent.previous.urlPath }}">Previous={{ page.adjacent.previous.title }}</a>{% endif %}{% if page.adjacent.next %}<a href="{{ page.adjacent.next.urlPath }}">Next={{ page.adjacent.next.title }}</a>{% endif %}</article>
 {% endblock %}`,
     ],
     [
@@ -205,6 +214,8 @@ About body.
     ],
     ["themes/starter/partials/empty.njk", ""],
     ["themes/starter/assets/site.txt", "asset"],
+    ["themes/starter/assets/favicon.svg", "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>"],
+    ["themes/starter/assets/og-default.svg", "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>"],
   ]);
 
   for (const [relativePath, contents] of files.entries()) {
@@ -265,6 +276,11 @@ describe("core engine", () => {
     );
     const aboutHtml = await readFile(path.join(siteRoot, "public/about/index.html"), "utf8");
     const paginatedHtml = await readFile(path.join(siteRoot, "public/page/2/index.html"), "utf8");
+    const legacyRedirectHtml = await readFile(path.join(siteRoot, "public/legacy-hello/index.html"), "utf8");
+    const configRedirectHtml = await readFile(path.join(siteRoot, "public/legacy-guides/index.html"), "utf8");
+    const rssXml = await readFile(path.join(siteRoot, "public/feed.xml"), "utf8");
+    const atomXml = await readFile(path.join(siteRoot, "public/atom.xml"), "utf8");
+    const redirectsManifest = await readFile(path.join(siteRoot, "public/_redirects"), "utf8");
     const hookOrder = await readFile(path.join(siteRoot, "hook-order.txt"), "utf8");
     const copiedAsset = await readFile(path.join(siteRoot, "public/assets/site.txt"), "utf8");
     const sitemapXml = await readFile(path.join(siteRoot, "public/sitemap.xml"), "utf8");
@@ -283,16 +299,30 @@ describe("core engine", () => {
     expect(postHtml).toContain('content="article"');
     expect(postHtml).toContain("http://localhost:3000/assets/og-default.svg");
     expect(postHtml).toContain('"@type":"BlogPosting"');
+    expect(postHtml).toContain("Next=Another Post");
     expect(postHtml).toContain('google-site-verification');
     expect(aboutHtml).toContain('content="noindex, follow"');
     expect(paginatedHtml).toContain('content="noindex, follow"');
+    expect(legacyRedirectHtml).toContain('content="0; url=../hello-world/index.html"');
+    expect(configRedirectHtml).toContain('content="0; url=../second-post/index.html"');
+    expect(rssXml).toContain("<rss version=\"2.0\">");
+    expect(rssXml).toContain("<title>Another Post</title>");
+    expect(atomXml).toContain("<feed xmlns=\"http://www.w3.org/2005/Atom\">");
+    expect(atomXml).toContain("<title>Hello World</title>");
+    expect(redirectsManifest).toContain("/legacy-hello/ /hello-world/ 301");
+    expect(redirectsManifest).toContain("/legacy-guides/ /second-post/ 301");
     expect(sitemapXml).toContain("<loc>http://localhost:3000/</loc>");
     expect(sitemapXml).toContain("<loc>http://localhost:3000/hello-world/</loc>");
     expect(sitemapXml).not.toContain("<loc>http://localhost:3000/about/</loc>");
     expect(sitemapXml).not.toContain("<loc>http://localhost:3000/page/2/</loc>");
+    expect(sitemapXml).not.toContain("<loc>http://localhost:3000/legacy-hello/</loc>");
     expect(robotsTxt).toContain("User-agent: *");
     expect(robotsTxt).toContain("Disallow: /private/");
     expect(robotsTxt).toContain("Sitemap: http://localhost:3000/sitemap.xml");
+    expect(result.redirects).toHaveLength(3);
+    expect(result.warnings).toHaveLength(0);
+    expect(result.feeds.rssPath).toBe("/feed.xml");
+    expect(result.feeds.atomPath).toBe("/atom.xml");
     expect(hookOrder.trim().split("\n")).toEqual(["config", "loaded", "routes", "done"]);
   });
 
@@ -426,6 +456,34 @@ Hello **world** from the first post.
     );
 
     await expect(buildSite(siteRoot)).rejects.toThrow("front matter image");
+  });
+
+  test("build reports content and SEO warnings without failing", async () => {
+    const siteRoot = await createFixtureSite();
+
+    await writeFile(
+      path.join(siteRoot, "content/posts/2026-03-30-second-post.md"),
+      `---
+title: Hello World
+slug: hello-world
+date: 2026-03-30T10:00:00.000Z
+aliases:
+  - /about/
+---
+
+See the [missing page](/does-not-exist/).
+`,
+      "utf8",
+    );
+
+    const result = await buildSite(siteRoot);
+    const warningCodes = result.warnings.map((warning) => warning.code);
+
+    expect(warningCodes).toContain("duplicate-title");
+    expect(warningCodes).toContain("duplicate-slug");
+    expect(warningCodes).toContain("missing-description");
+    expect(warningCodes).toContain("redirect-conflict");
+    expect(warningCodes).toContain("broken-internal-link");
   });
 
   test("dev server rebuilds on file change and static server serves built output", async () => {

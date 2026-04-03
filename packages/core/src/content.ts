@@ -19,6 +19,7 @@ import {
   formatDateIso,
   joinUrlPath,
   normalizeStringList,
+  normalizeUrlPath,
   parseDate,
   pathToPosix,
   slugify,
@@ -94,6 +95,7 @@ async function parseDocument({
   const excerpt = frontMatter.excerpt?.toString().trim() || excerptFromMarkdown(parsed.content);
   const draft = Boolean(frontMatter.draft) || filePath.startsWith(config.draftsDir);
   const future = sourceDate.getTime() > Date.now();
+  const aliases = normalizeStringList(frontMatter.aliases).map((alias) => normalizeUrlPath(alias));
 
   let urlPath: string;
   if (kind === "post") {
@@ -125,6 +127,7 @@ async function parseDocument({
       frontMatter.layout?.toString() ||
       (kind === "post" ? "post" : "page"),
     frontMatter,
+    aliases,
     date: formatDateIso(sourceDate),
     updated: formatDateIso(updated),
     tags,
@@ -204,6 +207,39 @@ function buildArchives(posts: Post[]): ArchiveGroup[] {
     );
 }
 
+function buildAdjacentPosts(posts: Post[]): ContentGraph["adjacentPosts"] {
+  const adjacentPosts: ContentGraph["adjacentPosts"] = {};
+
+  for (let index = 0; index < posts.length; index += 1) {
+    const post = posts[index];
+    const olderPost = posts[index + 1];
+    const newerPost = posts[index - 1];
+
+    adjacentPosts[post.id] = {
+      previous: olderPost
+        ? {
+            id: olderPost.id,
+            title: olderPost.title,
+            urlPath: olderPost.urlPath,
+            permalink: olderPost.permalink,
+            date: olderPost.date,
+          }
+        : undefined,
+      next: newerPost
+        ? {
+            id: newerPost.id,
+            title: newerPost.title,
+            urlPath: newerPost.urlPath,
+            permalink: newerPost.permalink,
+            date: newerPost.date,
+          }
+        : undefined,
+    };
+  }
+
+  return adjacentPosts;
+}
+
 export async function loadContent(config: SiteConfig): Promise<ContentGraph> {
   const patterns = ["**/*.md", "**/*.markdown"];
   const [postFiles, pageFiles, draftFiles] = await Promise.all([
@@ -235,5 +271,6 @@ export async function loadContent(config: SiteConfig): Promise<ContentGraph> {
     tags: buildTaxonomy(posts, config, "tags"),
     categories: buildTaxonomy(posts, config, "categories"),
     archives: buildArchives(posts),
+    adjacentPosts: buildAdjacentPosts(posts),
   };
 }

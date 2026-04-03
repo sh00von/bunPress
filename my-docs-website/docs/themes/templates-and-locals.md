@@ -28,6 +28,7 @@ Examples:
 
 - `page.posts` on index pages
 - `page.post` on single post pages
+- `page.adjacent` on single post pages
 - `page.page` on standalone pages
 - `page.entry` on taxonomy pages
 - `page.archives` on archive pages
@@ -49,6 +50,13 @@ The route manifest generated for the build.
 ### `engineAssets`
 
 Hashed engine-owned assets emitted by BunPress.
+
+### `feeds`
+
+Built-in feed locations for the current site.
+
+- `feeds.rssPath`
+- `feeds.atomPath`
 
 ### `slots`
 
@@ -95,6 +103,10 @@ page: {
 page: {
   title: string
   post: Post
+  adjacent: {
+    previous?: AdjacentPostLink
+    next?: AdjacentPostLink
+  }
 }
 ```
 

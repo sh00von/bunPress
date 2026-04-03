@@ -43,5 +43,22 @@
       {% set className = "slot-items slot-items--inline entry__footer-links" %}
       {% include "slot-items.njk" %}
     {% endif %}
+
+    {% if page.adjacent and (page.adjacent.previous or page.adjacent.next) %}
+      <nav class="entry__adjacent" aria-label="Adjacent posts">
+        <div class="entry__adjacent-card entry__adjacent-card--previous">
+          {% if page.adjacent.previous %}
+            <p class="entry__adjacent-label">Previous post</p>
+            <a class="entry__adjacent-link" href="{{ href(page.adjacent.previous.urlPath, currentUrlPath) }}">{{ page.adjacent.previous.title }}</a>
+          {% endif %}
+        </div>
+        <div class="entry__adjacent-card entry__adjacent-card--next">
+          {% if page.adjacent.next %}
+            <p class="entry__adjacent-label">Next post</p>
+            <a class="entry__adjacent-link" href="{{ href(page.adjacent.next.urlPath, currentUrlPath) }}">{{ page.adjacent.next.title }}</a>
+          {% endif %}
+        </div>
+      </nav>
+    {% endif %}
   </article>
 {% endblock %}

@@ -36,6 +36,9 @@ const SITE_CONFIG = `export default {
   permalinkStyle: "day-and-name",
   theme: "starter",
   paginationSize: 5,
+  redirects: {
+    "/start/": "/about/",
+  },
   seo: {
     siteName: "Platform Briefing",
     defaultDescription: "A Bun-first publishing system for product, platform, and engineering communication.",
@@ -335,7 +338,10 @@ const HOME_POST = `---
 title: Building a publishing system for product and engineering teams
 slug: hello-bunpress
 date: 2026-04-01T10:00:00.000Z
+description: Why BunPress is designed for teams that need clear product and engineering communication.
 author: BunPress Team
+aliases:
+  - /hello-bunpress-launch/
 tags:
   - platform
   - bunpress
@@ -356,6 +362,7 @@ The starter site is intentionally minimal so teams can ship clear writing withou
 
 const ABOUT_PAGE = `---
 title: About
+description: What BunPress is built for and how the starter site is intended to be used by product and engineering teams.
 ---
 
 BunPress is a Bun-first static publishing engine for product, platform, and engineering communication. The default starter favors strong defaults, clean presentation, and fast deployment.
@@ -431,6 +438,8 @@ const BASE_LAYOUT = `<!doctype html>
     {% if seo.twitter.image %}
       <meta name="twitter:image" content="{{ seo.twitter.image }}" />
     {% endif %}
+    <link rel="alternate" type="application/rss+xml" title="{{ site.title }} RSS" href="{{ href(feeds.rssPath, currentUrlPath) }}" />
+    <link rel="alternate" type="application/atom+xml" title="{{ site.title }} Atom" href="{{ href(feeds.atomPath, currentUrlPath) }}" />
     {% if seo.verification.google %}
       <meta name="google-site-verification" content="{{ seo.verification.google }}" />
     {% endif %}
@@ -716,6 +725,23 @@ const POST_LAYOUT = `{% extends "base.njk" %}
       {% set items = slots.post_footer[page.post.id] or [] %}
       {% set className = "slot-items slot-items--inline entry__footer-links" %}
       {% include "slot-items.njk" %}
+    {% endif %}
+
+    {% if page.adjacent and (page.adjacent.previous or page.adjacent.next) %}
+      <nav class="entry__adjacent" aria-label="Adjacent posts">
+        <div class="entry__adjacent-card entry__adjacent-card--previous">
+          {% if page.adjacent.previous %}
+            <p class="entry__adjacent-label">Previous post</p>
+            <a class="entry__adjacent-link" href="{{ href(page.adjacent.previous.urlPath, currentUrlPath) }}">{{ page.adjacent.previous.title }}</a>
+          {% endif %}
+        </div>
+        <div class="entry__adjacent-card entry__adjacent-card--next">
+          {% if page.adjacent.next %}
+            <p class="entry__adjacent-label">Next post</p>
+            <a class="entry__adjacent-link" href="{{ href(page.adjacent.next.urlPath, currentUrlPath) }}">{{ page.adjacent.next.title }}</a>
+          {% endif %}
+        </div>
+      </nav>
     {% endif %}
   </article>
 {% endblock %}
@@ -1242,6 +1268,38 @@ img {
   border-top: 1px solid var(--border);
 }
 
+.entry__adjacent {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+}
+
+.entry__adjacent-card {
+  min-height: 84px;
+}
+
+.entry__adjacent-card--next {
+  text-align: right;
+}
+
+.entry__adjacent-label {
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.entry__adjacent-link {
+  font-size: 1rem;
+  line-height: 1.4;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .archive-stack {
   display: flex;
   flex-direction: column;
@@ -1383,6 +1441,10 @@ img {
 
   .post-card {
     gap: 20px;
+  }
+
+  .entry__adjacent {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .post-card__media,

@@ -1,5 +1,6 @@
 import path from "node:path";
 import type {
+  AdjacentPostLinks,
   ContentGraph,
   PaginationInfo,
   RouteManifestEntry,
@@ -99,7 +100,11 @@ export function generateRoutes(
       outputPath: path.join(config.publicRoot, toOutputFile(post.urlPath)),
       layout: "post",
       title: `${post.title} - ${config.title}`,
-      pageData: { title: post.title, post },
+      pageData: {
+        title: post.title,
+        post,
+        adjacent: (content.adjacentPosts[post.id] ?? {}) satisfies AdjacentPostLinks,
+      },
     })),
     ...content.pages.map((page) => ({
       kind: "page" as const,

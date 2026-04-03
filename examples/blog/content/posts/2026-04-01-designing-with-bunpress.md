@@ -2,7 +2,10 @@
 title: Designing a dependable theme contract
 slug: designing-with-bunpress
 date: 2026-04-01T14:30:00.000Z
+description: How a stable theme and plugin contract helps BunPress stay maintainable for both site owners and extension developers.
 author: Product Engineering
+aliases:
+  - /design-contract/
 tags:
   - bun
   - design

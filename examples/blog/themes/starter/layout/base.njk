@@ -30,6 +30,8 @@
     {% if seo.twitter.image %}
       <meta name="twitter:image" content="{{ seo.twitter.image }}" />
     {% endif %}
+    <link rel="alternate" type="application/rss+xml" title="{{ site.title }} RSS" href="{{ href(feeds.rssPath, currentUrlPath) }}" />
+    <link rel="alternate" type="application/atom+xml" title="{{ site.title }} Atom" href="{{ href(feeds.atomPath, currentUrlPath) }}" />
     {% if seo.verification.google %}
       <meta name="google-site-verification" content="{{ seo.verification.google }}" />
     {% endif %}

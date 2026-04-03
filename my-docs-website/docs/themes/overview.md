@@ -102,4 +102,4 @@ The starter theme renders:
 
 The starter theme does not render `site_header` or `sidebar_primary` by default. Those slots remain available for custom themes that want a more extensible chrome or sidebar system.
 
-See [Plugin Slots](D:\work\hexo-clone-node\docs\plugins\slots.md).
+See [Plugin Slots](../plugins/slots.md).

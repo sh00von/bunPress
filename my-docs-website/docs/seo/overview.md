@@ -80,5 +80,5 @@ If you want BunPress to emit a fully custom `robots.txt`, set `seo.robotsTxt` in
 
 ## Read Next
 
-- [SEO Metadata and Schema](D:\work\hexo-clone-node\docs\seo\metadata-and-schema.md)
-- [Theme Overview](D:\work\hexo-clone-node\docs\themes\overview.md)
+- [SEO Metadata and Schema](./metadata-and-schema.md)
+- [Theme Overview](../themes/overview.md)

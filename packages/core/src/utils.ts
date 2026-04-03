@@ -28,6 +28,25 @@ export function joinUrlPath(...parts: string[]): string {
   return filtered.length === 0 ? "/" : `/${filtered.join("/")}/`;
 }
 
+export function normalizeUrlPath(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return "/";
+  }
+
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(trimmed) || trimmed.startsWith("//")) {
+    return trimmed;
+  }
+
+  const withLeadingSlash = ensureLeadingSlash(trimSlashes(trimmed) ? trimmed : "/");
+  if (withLeadingSlash === "/") {
+    return "/";
+  }
+
+  const hasExtension = /\.[a-zA-Z0-9]+$/.test(withLeadingSlash);
+  return hasExtension ? withLeadingSlash : withLeadingSlash.replace(/\/?$/, "/");
+}
+
 export function toOutputFile(urlPath: string): string {
   const clean = trimSlashes(urlPath);
   return clean ? `${clean}/index.html` : "index.html";
