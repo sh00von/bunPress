@@ -1,6 +1,6 @@
 {
   "name": "create-bunpress",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "license": "MIT",
   "author": "Shovon <https://shovon.bd/>",
   "homepage": "https://github.com/shovon/bunpress",
@@ -20,7 +20,7 @@
   ],
   "type": "module",
   "bin": {
-    "create-bunpress": "./dist/create-bunpress.js"
+    "create-bunpress": "dist/create-bunpress.js"
   },
   "files": [
     "dist",

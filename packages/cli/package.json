@@ -1,6 +1,6 @@
 {
   "name": "bunpress-kit",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "license": "MIT",
   "author": "Shovon <https://shovon.bd/>",
   "homepage": "https://github.com/shovon/bunpress",
@@ -24,7 +24,7 @@
   "type": "module",
   "main": "./dist/main.js",
   "bin": {
-    "bunpress": "./dist/bunpress.js"
+    "bunpress": "dist/bunpress.js"
   },
   "exports": {
     ".": "./dist/main.js"

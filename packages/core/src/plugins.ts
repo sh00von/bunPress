@@ -16,6 +16,7 @@ import {
   stringifyJsonForHtml,
   validateClassName,
 } from "./security.ts";
+import { toRelativeHref } from "./utils.ts";
 
 type HookRegistry = {
   [TName in HookName]: Array<
@@ -165,6 +166,25 @@ export function createDefaultHelpers(config: SiteConfig): Map<string, ThemeHelpe
   helpers.set("absoluteUrl", (value: unknown) => {
     const url = String(value ?? "/");
     return new URL(url, config.url).toString();
+  });
+
+  helpers.set("href", (value: unknown, fromUrlPath = "/") => {
+    const rawValue = String(value ?? "#");
+
+    try {
+      const resolved = new URL(rawValue);
+      const siteOrigin = new URL(config.url).origin;
+      if (resolved.origin === siteOrigin) {
+        return toRelativeHref(
+          `${resolved.pathname}${resolved.search}${resolved.hash}`,
+          String(fromUrlPath ?? "/"),
+        );
+      }
+    } catch {
+      // not an absolute URL
+    }
+
+    return toRelativeHref(rawValue, String(fromUrlPath ?? "/"));
   });
 
   helpers.set("json", (value: unknown) => stringifyJsonForHtml(value));

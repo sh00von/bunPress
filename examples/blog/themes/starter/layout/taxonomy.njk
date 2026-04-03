@@ -8,7 +8,7 @@
   <section class="post-feed post-feed--compact" aria-label="{{ page.entry.name }}">
     {% for post in page.entry.posts %}
       <article class="post-card post-card--compact">
-        <a class="post-card__media" href="{{ post.urlPath }}" aria-label="{{ post.title }}">
+        <a class="post-card__media" href="{{ href(post.urlPath, currentUrlPath) }}" aria-label="{{ post.title }}">
           {% if post.frontMatter.image %}
             <img src="{{ post.frontMatter.image }}" alt="{{ post.frontMatter.imageAlt or post.title }}" />
           {% else %}
@@ -19,9 +19,9 @@
           {% set items = slots.post_meta[post.id] or [] %}
           {% set className = "post-card__meta" %}
           {% include "post-meta.njk" %}
-          <h2 class="post-card__title"><a href="{{ post.urlPath }}">{{ post.title }}</a></h2>
+          <h2 class="post-card__title"><a href="{{ href(post.urlPath, currentUrlPath) }}">{{ post.title }}</a></h2>
           <p class="post-card__excerpt">{{ post.excerpt }}</p>
-          <a class="post-card__link" href="{{ post.urlPath }}">Continue reading</a>
+          <a class="post-card__link" href="{{ href(post.urlPath, currentUrlPath) }}">Continue reading</a>
         </div>
       </article>
     {% endfor %}

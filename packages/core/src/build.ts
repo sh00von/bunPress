@@ -20,7 +20,7 @@ import {
   resolveThemeConfig,
 } from "./theme.ts";
 import { buildRobotsTxt, buildSitemapXml, resolveSeo } from "./seo.ts";
-import { writeFileIfChanged } from "./utils.ts";
+import { toRelativeHref, writeFileIfChanged } from "./utils.ts";
 
 type SlotMap = Record<ThemeSlotName, Record<string, ThemeSlotItem[]> | ThemeSlotItem[]>;
 
@@ -161,6 +161,20 @@ async function renderLocals(
   engineAssets: Record<string, string>,
 ) {
   const slots = await resolveSlots(config, content, route, plugins);
+  const seo = resolveSeo({ config, content, route });
+  const themeSeo = {
+    ...seo,
+    breadcrumbsRelative: seo.breadcrumbs.map((item) => {
+      const itemUrl = new URL(item.url);
+      return {
+        ...item,
+        href: toRelativeHref(
+          `${itemUrl.pathname}${itemUrl.search}${itemUrl.hash}`,
+          route.urlPath,
+        ),
+      };
+    }),
+  };
 
   return {
     site: {
@@ -168,7 +182,8 @@ async function renderLocals(
       theme: config.themeConfig,
     },
     page: route.pageData,
-    seo: resolveSeo({ config, content, route }),
+    currentUrlPath: route.urlPath,
+    seo: themeSeo,
     routes,
     engineAssets,
     slots,

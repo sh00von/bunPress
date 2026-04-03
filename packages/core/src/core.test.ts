@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, test } from "bun:test";
 import { buildSite, createDevServer, createStaticServer, loadConfig, loadContent } from "./index.ts";
+import { toRelativeHref } from "./utils.ts";
 
 const tempDirs: string[] = [];
 
@@ -225,6 +226,17 @@ afterEach(async () => {
 });
 
 describe("core engine", () => {
+  test("converts internal site paths to page-relative hrefs for file output", () => {
+    expect(toRelativeHref("/assets/css/site.css", "/")).toBe("assets/css/site.css");
+    expect(toRelativeHref("/assets/css/site.css", "/2026/04/01/hello-bunpress/")).toBe(
+      "../../../../assets/css/site.css",
+    );
+    expect(toRelativeHref("/", "/2026/04/01/hello-bunpress/")).toBe("../../../../index.html");
+    expect(toRelativeHref("https://example.com", "/2026/04/01/hello-bunpress/")).toBe(
+      "https://example.com",
+    );
+  });
+
   test("loads config and normalized content graph", async () => {
     const siteRoot = await createFixtureSite();
     const config = await loadConfig(siteRoot);

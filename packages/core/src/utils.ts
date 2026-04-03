@@ -37,6 +37,32 @@ export function toPermalink(siteUrl: string, urlPath: string): string {
   return new URL(ensureLeadingSlash(trimSlashes(urlPath) ? urlPath : "/"), siteUrl).toString();
 }
 
+export function toRelativeHref(target: string, fromUrlPath: string): string {
+  if (!target) {
+    return target;
+  }
+
+  if (
+    target.startsWith("#") ||
+    target.startsWith("//") ||
+    /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(target)
+  ) {
+    return target;
+  }
+
+  if (!target.startsWith("/")) {
+    return target;
+  }
+
+  const fromDirectory = path.posix.dirname(toOutputFile(fromUrlPath));
+  const targetPath = target.endsWith("/")
+    ? toOutputFile(target)
+    : trimSlashes(target);
+
+  const relativePath = path.posix.relative(fromDirectory, targetPath);
+  return relativePath || "index.html";
+}
+
 export function excerptFromMarkdown(markdown: string): string {
   const explicit = markdown.split("<!-- more -->")[0]?.trim();
   const source = explicit || markdown;

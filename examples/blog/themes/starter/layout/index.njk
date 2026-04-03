@@ -9,7 +9,7 @@
   <section class="post-feed" aria-label="Posts">
     {% for post in page.posts %}
       <article class="post-card">
-        <a class="post-card__media" href="{{ post.urlPath }}" aria-label="{{ post.title }}">
+        <a class="post-card__media" href="{{ href(post.urlPath, currentUrlPath) }}" aria-label="{{ post.title }}">
           {% if post.frontMatter.image %}
             <img src="{{ post.frontMatter.image }}" alt="{{ post.frontMatter.imageAlt or post.title }}" />
           {% else %}
@@ -20,9 +20,9 @@
           {% set items = slots.post_meta[post.id] or [] %}
           {% set className = "post-card__meta" %}
           {% include "post-meta.njk" %}
-          <h2 class="post-card__title"><a href="{{ post.urlPath }}">{{ post.title }}</a></h2>
+          <h2 class="post-card__title"><a href="{{ href(post.urlPath, currentUrlPath) }}">{{ post.title }}</a></h2>
           <p class="post-card__excerpt">{{ post.excerpt }}</p>
-          <a class="post-card__link" href="{{ post.urlPath }}">Continue reading</a>
+          <a class="post-card__link" href="{{ href(post.urlPath, currentUrlPath) }}">Continue reading</a>
         </div>
       </article>
     {% endfor %}
@@ -30,9 +30,9 @@
 
   {% if page.pagination.totalPages > 1 %}
     <nav class="pagination pagination--minimal" aria-label="Pagination">
-      <a class="pagination__link{% if not page.pagination.prevUrl %} is-disabled{% endif %}" href="{{ page.pagination.prevUrl or '#' }}">Previous</a>
+      <a class="pagination__link{% if not page.pagination.prevUrl %} is-disabled{% endif %}" href="{{ href(page.pagination.prevUrl or '#', currentUrlPath) }}">Previous</a>
       <span class="pagination__status">Page {{ page.pagination.currentPage }} of {{ page.pagination.totalPages }}</span>
-      <a class="pagination__link{% if not page.pagination.nextUrl %} is-disabled{% endif %}" href="{{ page.pagination.nextUrl or '#' }}">Next</a>
+      <a class="pagination__link{% if not page.pagination.nextUrl %} is-disabled{% endif %}" href="{{ href(page.pagination.nextUrl or '#', currentUrlPath) }}">Next</a>
     </nav>
   {% endif %}
 {% endblock %}

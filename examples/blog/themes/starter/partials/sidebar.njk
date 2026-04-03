@@ -9,7 +9,7 @@
     <h2 id="sidebar-categories" class="sidebar-section__title">Categories</h2>
     <ul class="sidebar-list">
       {% for category in collections.categories %}
-        <li><a href="{{ category.urlPath }}">{{ category.name }}</a></li>
+        <li><a href="{{ href(category.urlPath, currentUrlPath) }}">{{ category.name }}</a></li>
       {% endfor %}
     </ul>
   </section>
@@ -20,7 +20,7 @@
     <h2 id="sidebar-tags" class="sidebar-section__title">Tags</h2>
     <ul class="sidebar-list sidebar-list--tags">
       {% for tag in collections.tags %}
-        <li><a href="{{ tag.urlPath }}">{{ tag.name }}</a></li>
+        <li><a href="{{ href(tag.urlPath, currentUrlPath) }}">{{ tag.name }}</a></li>
       {% endfor %}
     </ul>
   </section>
@@ -32,7 +32,7 @@
     <ul class="sidebar-list">
       {% for post in collections.posts %}
         {% if loop.index <= 5 %}
-          <li><a href="{{ post.urlPath }}">{{ post.title }}</a></li>
+          <li><a href="{{ href(post.urlPath, currentUrlPath) }}">{{ post.title }}</a></li>
         {% endif %}
       {% endfor %}
     </ul>

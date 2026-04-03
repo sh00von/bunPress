@@ -5,7 +5,7 @@
       {% if item.kind == "button" %}
         <a
           class="{{ item.className or itemClassName or 'slot-items__button' }}"
-          href="{{ item.url or '#' }}"
+          href="{{ href(item.url or '#', currentUrlPath) }}"
           {% if item.title %}title="{{ item.title }}"{% endif %}
           {% if item.rel %}rel="{{ item.rel }}"{% endif %}
           {% if item.target %}target="{{ item.target }}"{% endif %}
@@ -13,7 +13,7 @@
       {% elif item.kind == "link" or item.url %}
         <a
           class="{{ item.className or itemClassName or 'slot-items__link' }}"
-          href="{{ item.url or '#' }}"
+          href="{{ href(item.url or '#', currentUrlPath) }}"
           {% if item.title %}title="{{ item.title }}"{% endif %}
           {% if item.rel %}rel="{{ item.rel }}"{% endif %}
           {% if item.target %}target="{{ item.target }}"{% endif %}
