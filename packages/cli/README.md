@@ -21,6 +21,9 @@ bunpress publish github --dry-run
 bunpress publish vercel --dry-run
 ```
 
+`bunpress build` generates your final static site into `public/`.
+If you are deploying manually, deploy only the `public/` folder.
+
 ## Highlights
 
 - Markdown authoring with front matter

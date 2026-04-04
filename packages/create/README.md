@@ -22,6 +22,9 @@ bun install
 bunpress dev
 ```
 
+When you run `bunpress build`, BunPress generates the final static site into `public/`.
+If you deploy manually, deploy only the `public/` folder.
+
 ## What You Get
 
 - a starter BunPress site

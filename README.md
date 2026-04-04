@@ -36,6 +36,9 @@ bunpress publish github
 bunpress publish vercel
 ```
 
+`bunpress build` generates your final static site into `public/`.
+If you are deploying manually, deploy only the `public/` folder.
+
 ## Read Next
 
 - [Getting Started](./my-docs-website/docs/getting-started.md)

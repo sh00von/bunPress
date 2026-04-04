@@ -367,6 +367,7 @@ async function publishGitHub(
     printDryRunSummary("github", siteUrl, result.outputDir, [
       `GitHub publish is configured for ${repo}#${branch}`,
       ...(deploy.cname?.trim() ? [`Would write CNAME=${deploy.cname.trim()}`] : []),
+      "BunPress publishes the built public/ folder for you.",
       "Static redirect pages and _redirects will be included in the output.",
       "If this looks right, run: bunpress publish github",
     ]);
@@ -444,6 +445,7 @@ async function publishVercel(
     printDryRunSummary("vercel", siteUrl, result.outputDir, [
       `Vercel publish is configured${deploy.project ? ` for project ${deploy.project}` : ""}`,
       `Would run: vercel ${args.join(" ")}`,
+      "BunPress publishes the built public/ folder for you.",
       "Canonical URLs, feeds, sitemap, and redirects will use the configured site URL.",
       "If this looks right, run: bunpress publish vercel",
     ]);
@@ -604,6 +606,7 @@ Examples:
       progress.complete(`Build completed (${result.routes.length} routes)`);
       printBuildWarnings(result.warnings);
       console.log(`Built ${result.routes.length} routes into ${result.outputDir}`);
+      console.log("Deploy only the public/ folder to your hosting provider.");
       printNextSteps("Next steps:", ["bunpress serve", "bunpress publish github --dry-run"]);
     });
 

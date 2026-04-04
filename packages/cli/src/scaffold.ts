@@ -167,6 +167,9 @@ bunpress build
 bunpress serve
 \`\`\`
 
+BunPress generates your final static site into \`public/\`.
+Deploy only the \`public/\` folder to your hosting provider.
+
 ## Release Checklist
 
 1. Update \`url\` in \`site.config.ts\` to your real production domain.
