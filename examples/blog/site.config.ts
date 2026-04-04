@@ -1,6 +1,11 @@
 export default {
   title: "Platform Briefing",
-  url: "http://localhost:3000/",
+  // Set this to your real production URL before publishing.
+  // Examples:
+  // - Vercel production: "https://platform-briefing.vercel.app/"
+  // - GitHub Pages project site: "https://owner.github.io/repo/"
+  // - Custom domain: "https://briefing.example.com/"
+  url: "https://platform-briefing.example.com/",
   description: "Clear updates on product direction, platform decisions, and engineering execution.",
   language: "en",
   // Available permalinkStyle values:
@@ -22,10 +27,11 @@ export default {
     defaultOgImageAlt: "BunPress product publishing preview",
     favicon: "/assets/favicon.svg",
     themeColor: "#111111",
+    // Keep robots.txt aligned with your production URL so sitemap and canonical data stay correct after deploy.
     robotsTxt: `User-agent: *
 Allow: /
 Disallow: /preview/
-Sitemap: http://localhost:3000/sitemap.xml
+Sitemap: https://platform-briefing.example.com/sitemap.xml
 `,
     organization: {
       name: "BunPress Studio",
@@ -99,11 +105,14 @@ Sitemap: http://localhost:3000/sitemap.xml
   ],
   deploy: {
     github: {
+      // Use "owner/repo" or a full git URL.
       repo: "",
       branch: "gh-pages",
+      // Set this only when you are using a custom domain on GitHub Pages.
       cname: "",
     },
     vercel: {
+      // Run "vercel link" in this site before your first publish.
       project: "",
       prod: true,
     },

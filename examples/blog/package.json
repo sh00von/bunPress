@@ -8,7 +8,9 @@
     "serve": "bunpress serve",
     "new:post": "bunpress new post",
     "new:page": "bunpress new page",
+    "publish:github:dry": "bunpress publish github --dry-run",
     "publish:github": "bunpress publish github",
+    "publish:vercel:dry": "bunpress publish vercel --dry-run",
     "publish:vercel": "bunpress publish vercel"
   },
   "dependencies": {
