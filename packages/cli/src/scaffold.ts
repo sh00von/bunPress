@@ -7,7 +7,7 @@ const SITE_PACKAGE_JSON = `{
   "type": "module",
   "packageManager": "bun@1.3.10",
   "devDependencies": {
-      "bunpress-kit": "^1.0.6"
+      "bunpress-kit": "^1.0.7"
   },
   "scripts": {
     "dev": "bunpress dev",
