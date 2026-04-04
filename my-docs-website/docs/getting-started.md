@@ -1,6 +1,14 @@
 # Getting Started
 
-## Create a Site
+This guide is the shortest path from zero to a local BunPress site.
+
+By the end, you will have:
+
+- a generated site with content, themes, plugins, and scaffolds
+- a local preview running with rebuilds
+- the core commands you need before release
+
+## 1. Create a site
 
 ```bash
 npx create-bunpress@latest mysite
@@ -8,18 +16,19 @@ cd mysite
 bun install
 ```
 
-This creates a complete BunPress site with:
+The generated site includes:
 
-- `site.config.ts`
-- `content/`
-- `themes/`
-- `plugins/`
-- `scaffolds/`
-- `public/` once you build
+- `site.config.ts` for site-level settings
+- `content/` for posts, pages, and drafts
+- `themes/` for local theme files
+- `plugins/` for local extensions
+- `scaffolds/` for content templates
+- `public/` after your first build
 
-The default starter also ships with a professional product-and-engineering tone, so a fresh site already looks appropriate for platform updates, release notes, or CTO-style publishing.
+The starter output is intentionally professional and restrained, so a fresh site already fits release notes,
+platform updates, docs-style writing, and product communication.
 
-## Create Content
+## 2. Add content
 
 ```bash
 bunpress new post "Hello World"
@@ -27,31 +36,32 @@ bunpress new page "About"
 bunpress new draft "Roadmap Ideas"
 ```
 
-You can also use a custom scaffold:
+You can also create content from a custom scaffold:
 
 ```bash
 bunpress new post "Launch Day" --scaffold announcement
 ```
 
-## Run Locally
+## 3. Preview locally
 
 ```bash
 bunpress dev
 ```
 
-This starts the BunPress development server with rebuilds on content and theme changes.
+This starts the local development server and rebuilds when content or theme files change.
 
-`site.config.ts`, theme config files, and plugins execute as local code during build and dev, so only run BunPress sites you trust.
+`site.config.ts`, theme config files, and plugins execute as local code during build and dev, so only run
+BunPress sites you trust.
 
-## Build Static Output
+## 4. Build release output
 
 ```bash
 bunpress build
 ```
 
-`bunpress build` automatically clears the generated output directory first, then rebuilds the site from scratch.
+`bunpress build` clears the generated output directory and rebuilds the site from scratch.
 
-The built site also includes BunPress SEO defaults such as:
+Built output includes release-friendly defaults such as:
 
 - canonical URLs
 - Open Graph and Twitter metadata
@@ -59,14 +69,15 @@ The built site also includes BunPress SEO defaults such as:
 - WordPress-style permalink presets
 - `sitemap.xml`
 - `robots.txt`
+- favicon and app icon metadata
 
-To remove generated output without rebuilding:
+If you only want to remove generated output:
 
 ```bash
 bunpress clean
 ```
 
-## Publish
+## 5. Publish
 
 ### GitHub Pages
 
@@ -75,7 +86,7 @@ bunpress publish github --dry-run
 bunpress publish github
 ```
 
-Configure GitHub deploy settings in `site.config.ts`:
+Configure GitHub publishing in `site.config.ts`:
 
 ```ts
 deploy: {
@@ -94,16 +105,16 @@ bunpress publish vercel --dry-run
 bunpress publish vercel
 ```
 
-Before the first Vercel publish, link the site:
+Before the first Vercel publish:
 
 ```bash
 vercel link
 ```
 
-## Read Next
+## What to read next
 
-- [Site Structure](./site-structure.md)
-- [Feature Overview](./features.md)
-- [SEO Overview](./seo/overview.md)
-- [Theme Overview](./themes/overview.md)
-- [Plugin Overview](./plugins/overview.md)
+- [Feature Overview](./features.md) for the full product surface
+- [Site Structure](./site-structure.md) for the generated file model
+- [SEO Overview](./seo/overview.md) for metadata, schema, and feeds
+- [Theme Overview](./themes/overview.md) if you want to change the visual system
+- [Plugin Overview](./plugins/overview.md) if you want to extend behavior

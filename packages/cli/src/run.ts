@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { cp, mkdtemp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { cp, mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { Command } from "commander";
@@ -8,11 +8,106 @@ import { buildSite, cleanSite, loadConfig, loadContent, type GitHubDeployConfig,
 import { createDevServer, createStaticServer } from "@bunpress/dev-server";
 import { ensureEmptyOrMissing, scaffoldPlugin, scaffoldSite, scaffoldTheme } from "./scaffold.ts";
 import { BuildProgressManager, BuildProgressRenderer } from "./progress.ts";
+import cliPackage from "../package.json";
 
 type ContentKind = "post" | "page" | "draft";
 
 interface CreateContentOptions {
   scaffold?: string;
+}
+
+function quoteShellValue(value: string): string {
+  return /\s/.test(value) ? `"${value.replace(/"/g, '\\"')}"` : value;
+}
+
+function printNextSteps(title: string, steps: string[]) {
+  if (!steps.length) {
+    return;
+  }
+
+  console.log("");
+  console.log(title);
+  for (const step of steps) {
+    console.log(`  ${step}`);
+  }
+}
+
+function relativePathFromCwd(targetDir: string): string {
+  return path.relative(process.cwd(), targetDir) || ".";
+}
+
+function portFromOption(portValue: string, commandName: "dev" | "serve"): number {
+  const port = Number(portValue);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error(
+      `Invalid port "${portValue}". Use a whole number between 1 and 65535, for example \`bunpress ${commandName} --port 3000\`.`,
+    );
+  }
+
+  return port;
+}
+
+function isPlaceholderHostname(hostname: string): boolean {
+  const normalized = hostname.toLowerCase();
+  return normalized === "example.com"
+    || normalized === "example.org"
+    || normalized === "example.net"
+    || normalized.endsWith(".example.com")
+    || normalized.endsWith(".example.org")
+    || normalized.endsWith(".example.net");
+}
+
+function validatePublishUrl(siteUrl: string): string {
+  let parsed: URL;
+  try {
+    parsed = new URL(siteUrl);
+  } catch {
+    throw new Error(
+      `Invalid site URL "${siteUrl}". Set "url" in site.config.ts to your production site URL before publishing.`,
+    );
+  }
+
+  const hostname = parsed.hostname.toLowerCase();
+  if (
+    hostname === "localhost"
+    || hostname === "127.0.0.1"
+    || hostname === "::1"
+    || hostname.endsWith(".localhost")
+  ) {
+    throw new Error(
+      `Publishing is blocked because site.config.ts still uses a local URL (${siteUrl}). Set "url" to your production site URL before publishing or running a deploy dry-run.`,
+    );
+  }
+
+  if (isPlaceholderHostname(hostname)) {
+    throw new Error(
+      `Publishing is blocked because site.config.ts still uses a placeholder URL (${siteUrl}). Replace it with your real production domain before publishing or running a deploy dry-run.`,
+    );
+  }
+
+  return parsed.toString();
+}
+
+function printDryRunSummary(
+  target: "github" | "vercel",
+  siteUrl: string,
+  outputDir: string,
+  extra: string[],
+) {
+  const normalizedSiteUrl = siteUrl.endsWith("/") ? siteUrl : `${siteUrl}/`;
+  const sitemapUrl = new URL("sitemap.xml", normalizedSiteUrl).toString();
+  const feedUrl = new URL("feed.xml", normalizedSiteUrl).toString();
+  const atomUrl = new URL("atom.xml", normalizedSiteUrl).toString();
+
+  console.log(`[dry-run] Target: ${target}`);
+  console.log(`[dry-run] Site URL: ${normalizedSiteUrl}`);
+  console.log(`[dry-run] Output directory: ${outputDir}`);
+  console.log(`[dry-run] sitemap.xml -> ${sitemapUrl}`);
+  console.log(`[dry-run] feed.xml -> ${feedUrl}`);
+  console.log(`[dry-run] atom.xml -> ${atomUrl}`);
+  for (const line of extra) {
+    console.log(`[dry-run] ${line}`);
+  }
 }
 
 function printBuildWarnings(
@@ -199,6 +294,12 @@ async function runServer(commandName: "dev" | "serve", cwd: string, port: number
   });
 
   console.log(`${commandName} server running at http://localhost:${port}`);
+  printNextSteps(
+    commandName === "dev" ? "Try this next:" : "Preview tips:",
+    commandName === "dev"
+      ? ['bunpress new post "Launch Notes"', "bunpress build"]
+      : ["Open the URL in your browser", "Press Ctrl+C to stop the server"],
+  );
 
   const shutdown = async () => {
     await server.close();
@@ -252,6 +353,7 @@ async function publishGitHub(
   }
 
   const config = await loadConfig(cwd);
+  const siteUrl = validatePublishUrl(config.url);
   const deploy = {
     ...config.deploy.github,
     ...override,
@@ -262,11 +364,12 @@ async function publishGitHub(
   printBuildWarnings(result.warnings);
 
   if (override.dryRun) {
-    console.log(`[dry-run] GitHub publish is configured for ${repo}#${branch}`);
-    console.log(`[dry-run] Would publish ${result.outputDir}`);
-    if (deploy.cname?.trim()) {
-      console.log(`[dry-run] Would write CNAME=${deploy.cname.trim()}`);
-    }
+    printDryRunSummary("github", siteUrl, result.outputDir, [
+      `GitHub publish is configured for ${repo}#${branch}`,
+      ...(deploy.cname?.trim() ? [`Would write CNAME=${deploy.cname.trim()}`] : []),
+      "Static redirect pages and _redirects will be included in the output.",
+      "If this looks right, run: bunpress publish github",
+    ]);
     return;
   }
 
@@ -290,6 +393,10 @@ async function publishGitHub(
     });
 
     console.log(`Published ${result.outputDir} to ${repo}#${branch}`);
+    printNextSteps("After publish:", [
+      `Check the live site and sitemap at ${siteUrl}`,
+      "Confirm your GitHub Pages deployment finished successfully",
+    ]);
   } finally {
     await rm(publishDir, { recursive: true, force: true });
   }
@@ -306,6 +413,7 @@ async function publishVercel(
   }
 
   const config = await loadConfig(cwd);
+  const siteUrl = validatePublishUrl(config.url);
   const deploy = {
     ...config.deploy.vercel,
     ...override,
@@ -333,8 +441,12 @@ async function publishVercel(
   }
 
   if (override.dryRun) {
-    console.log(`[dry-run] Vercel publish is configured${deploy.project ? ` for project ${deploy.project}` : ""}`);
-    console.log(`[dry-run] Would run: vercel ${args.join(" ")}`);
+    printDryRunSummary("vercel", siteUrl, result.outputDir, [
+      `Vercel publish is configured${deploy.project ? ` for project ${deploy.project}` : ""}`,
+      `Would run: vercel ${args.join(" ")}`,
+      "Canonical URLs, feeds, sitemap, and redirects will use the configured site URL.",
+      "If this looks right, run: bunpress publish vercel",
+    ]);
     return;
   }
 
@@ -344,6 +456,10 @@ async function publishVercel(
   });
 
   console.log(`Published ${result.outputDir} to Vercel`);
+  printNextSteps("After publish:", [
+    `Check the deployment and confirm canonical URLs use ${siteUrl}`,
+    "Verify redirects, sitemap.xml, and feed.xml on the live site",
+  ]);
 }
 
 export async function run(argv: string[]): Promise<number> {
@@ -352,7 +468,58 @@ export async function run(argv: string[]): Promise<number> {
   const newCommand = program.command("new").description("create a new post, page, or draft");
   const publishCommand = program.command("publish").alias("deploy").description("publish the current site");
 
-  program.name("bunpress").description("Bun-first static site generator and publishing CLI");
+  program
+    .name("bunpress")
+    .description("Bun-first static site generator and publishing CLI")
+    .version(cliPackage.version)
+    .showSuggestionAfterError()
+    .showHelpAfterError("(run with --help for command usage)")
+    .addHelpText(
+      "after",
+      `
+Quick start:
+  bunpress init mysite
+  cd mysite
+  bun install
+  bunpress dev
+
+Common release flow:
+  bunpress new post "Launch Notes"
+  bunpress build
+  bunpress publish github --dry-run
+  bunpress publish github
+`,
+    );
+
+  initCommand.addHelpText(
+    "after",
+    `
+Examples:
+  bunpress init mysite
+  bunpress init .
+  bunpress init theme magazine
+  bunpress init plugin reading-badge
+`,
+  );
+  newCommand.addHelpText(
+    "after",
+    `
+Examples:
+  bunpress new post "Launch Notes"
+  bunpress new page "About"
+  bunpress new draft "Roadmap Ideas"
+  bunpress new post "Release Notes" --scaffold announcement
+`,
+  );
+  publishCommand.addHelpText(
+    "after",
+    `
+Examples:
+  bunpress publish github --dry-run
+  bunpress publish github --repo owner/repo
+  bunpress publish vercel --dry-run
+`,
+  );
 
   initCommand
     .argument("[dir]", "directory to scaffold", ".")
@@ -361,45 +528,67 @@ export async function run(argv: string[]): Promise<number> {
       await ensureEmptyOrMissing(targetDir);
       await mkdir(targetDir, { recursive: true });
       await scaffoldSite(targetDir);
-      console.log(`Scaffolded BunPress site in ${targetDir}`);
+      console.log(`Scaffolded a BunPress site in ${targetDir}`);
+      const nextSteps = [
+        ...(relativePathFromCwd(targetDir) === "." ? [] : [`cd ${quoteShellValue(relativePathFromCwd(targetDir))}`]),
+        "bun install",
+        "bunpress dev",
+        'bunpress new post "Launch Notes"',
+      ];
+      printNextSteps("Next steps:", nextSteps);
     });
 
   initCommand
     .command("theme")
+    .description("scaffold a local theme starter")
     .argument("<name>", "theme name")
     .action(async (name: string) => {
       const normalized = normalizeName(name);
       const targetDir = path.resolve(process.cwd(), "themes", normalized);
       await ensureEmptyOrMissing(targetDir);
       await scaffoldTheme(targetDir);
-      console.log(`Scaffolded BunPress theme in ${targetDir}`);
+      console.log(`Scaffolded a BunPress theme in ${targetDir}`);
+      printNextSteps("Next steps:", [
+        `Set \`theme: "${normalized}"\` in site.config.ts`,
+        `Edit ${path.posix.join("themes", normalized, "layout", "index.njk")}`,
+        "bunpress dev",
+      ]);
     });
 
   initCommand
     .command("plugin")
+    .description("scaffold a local plugin starter")
     .argument("<name>", "plugin name")
     .action(async (name: string) => {
       const normalized = normalizeName(name);
       const targetDir = path.resolve(process.cwd(), "plugins", normalized);
       await ensureEmptyOrMissing(targetDir);
       await scaffoldPlugin(targetDir, normalized);
-      console.log(`Scaffolded BunPress plugin in ${targetDir}`);
+      console.log(`Scaffolded a BunPress plugin in ${targetDir}`);
+      printNextSteps("Next steps:", [
+        `Add \`"./plugins/${normalized}/index.ts"\` to \`plugins\` in site.config.ts`,
+        `Edit ${path.posix.join("plugins", normalized, "index.ts")}`,
+        "bunpress build",
+      ]);
     });
 
   for (const kind of ["post", "page", "draft"] as const) {
     newCommand
       .command(kind)
+      .description(`create a new ${kind}`)
       .argument("<title>", `${kind} title`)
       .option("-s, --scaffold <name>", "custom scaffold name")
       .action(async (title: string, options: CreateContentOptions) => {
         const filePath = await createContentFile(process.cwd(), kind, title, options);
-        console.log(`Created ${kind}: ${filePath}`);
+        console.log(`Created ${kind} at ${filePath}`);
+        printNextSteps("Next steps:", ["bunpress dev", "bunpress build"]);
       });
   }
 
   program
     .command("build")
     .alias("generate")
+    .description("build the current site into static HTML")
     .action(async () => {
       const progress = new BuildProgressRenderer("[bunpress:build]");
       let result;
@@ -415,35 +604,50 @@ export async function run(argv: string[]): Promise<number> {
       progress.complete(`Build completed (${result.routes.length} routes)`);
       printBuildWarnings(result.warnings);
       console.log(`Built ${result.routes.length} routes into ${result.outputDir}`);
+      printNextSteps("Next steps:", ["bunpress serve", "bunpress publish github --dry-run"]);
     });
 
   program
     .command("dev")
     .alias("server")
+    .description("run the local development server with rebuilds")
     .option("-p, --port <port>", "port to use", "3000")
     .action(async (options: { port: string }) => {
-      await runServer("dev", process.cwd(), Number(options.port));
+      await runServer("dev", process.cwd(), portFromOption(options.port, "dev"));
     });
 
   program
     .command("serve")
+    .description("serve the generated static output locally")
     .option("-p, --port <port>", "port to use", "3000")
     .action(async (options: { port: string }) => {
-      await runServer("serve", process.cwd(), Number(options.port));
+      await runServer("serve", process.cwd(), portFromOption(options.port, "serve"));
     });
 
   program
     .command("clean")
+    .description("remove generated output")
     .action(async () => {
       await cleanSite(process.cwd());
       console.log("Removed generated output");
+      printNextSteps("Next steps:", ["bunpress build", "bunpress dev"]);
     });
 
   program
     .command("list")
+    .description("list published posts and pages")
     .action(async () => {
       const config = await loadConfig(process.cwd());
       const content = await loadContent(config);
+      if (content.posts.length === 0 && content.pages.length === 0) {
+        console.log("No published posts or pages found.");
+        printNextSteps("Start writing:", [
+          'bunpress new post "Launch Notes"',
+          'bunpress new page "About"',
+        ]);
+        return;
+      }
+
       console.log(`Posts (${content.posts.length})`);
       for (const post of content.posts) {
         console.log(`- ${post.title} -> ${post.urlPath}`);
@@ -456,6 +660,7 @@ export async function run(argv: string[]): Promise<number> {
 
   publishCommand
     .command("github")
+    .description("publish the current site to GitHub Pages")
     .option("--repo <repo>", "GitHub repo as owner/repo or full URL")
     .option("--branch <branch>", "branch to publish", "gh-pages")
     .option("--cname <cname>", "custom domain")
@@ -466,6 +671,7 @@ export async function run(argv: string[]): Promise<number> {
 
   publishCommand
     .command("vercel")
+    .description("publish the current site to Vercel")
     .option("--project <project>", "expected linked Vercel project name")
     .option("--prod", "deploy to production")
     .option("--preview", "deploy as preview instead of production")

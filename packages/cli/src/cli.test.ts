@@ -6,12 +6,13 @@ import { afterEach, beforeAll, describe, expect, test } from "bun:test";
 import type { BuildProgressEvent } from "@bunpress/core";
 import { run } from "./run.ts";
 import { BuildProgressRenderer } from "./progress.ts";
+import cliPackage from "../package.json";
 
 const tempDirs: string[] = [];
 const builtCliPath = path.resolve(import.meta.dir, "../dist/bunpress.js");
 const runtimeExecutable = process.execPath;
 
-function withCwd(targetDir: string, callback: () => Promise<void>) {
+function withCwd<T>(targetDir: string, callback: () => Promise<T>) {
   const previous = process.cwd();
   process.chdir(targetDir);
 
@@ -86,6 +87,15 @@ async function captureConsole(
   }
 }
 
+async function replaceInFile(
+  filePath: string,
+  from: string,
+  to: string,
+) {
+  const contents = await readFile(filePath, "utf8");
+  await writeFile(filePath, contents.replace(from, to), "utf8");
+}
+
 function createProgressEvent(overrides: Partial<BuildProgressEvent> = {}): BuildProgressEvent {
   return {
     phaseId: "content",
@@ -119,16 +129,28 @@ describe("cli", () => {
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain("bunpress");
     expect(result.stdout).toContain("publish");
+    expect(result.stdout).toContain("Quick start:");
+    expect(result.stdout).toContain("Common release flow:");
+  });
+
+  test("bunpress reports its package version", async () => {
+    const result = await captureConsole(async () => await run(["--version"]), "log");
+
+    expect(result.exitCode).toBe(0);
+    expect(result.messages.join("\n")).toContain(cliPackage.version);
   });
 
   test("init scaffolds a standalone site with default scaffolds", async () => {
     const siteRoot = await mkdtemp(path.join(os.tmpdir(), "bunpress-cli-init-"));
     tempDirs.push(siteRoot);
 
-    await withCwd(siteRoot, async () => {
-      const exitCode = await run(["init", "."]);
-      expect(exitCode).toBe(0);
-    });
+    const result = await captureConsole(async () => await withCwd(siteRoot, async () => await run(["init", "."])), "log");
+
+    expect(result.exitCode).toBe(0);
+    expect(result.messages.join("\n")).toContain("Scaffolded a BunPress site");
+    expect(result.messages.join("\n")).toContain("Next steps:");
+    expect(result.messages.join("\n")).toContain("bun install");
+    expect(result.messages.join("\n")).toContain('bunpress new post "Launch Notes"');
 
     const topLevelEntries = await readdir(siteRoot);
     const packageJson = await readFile(path.join(siteRoot, "package.json"), "utf8");
@@ -257,8 +279,18 @@ describe("cli", () => {
       expect(output).toContain("[bunpress:build] 9/9 Complete");
       expect(output).toContain("Build completed (");
       expect(output).toContain("Built ");
+      expect(output).toContain("Next steps:");
+      expect(output).toContain("bunpress serve");
       expect(output).not.toContain("\x1b[42m");
     });
+  });
+
+  test("dev command validates invalid ports clearly", async () => {
+    const result = await captureConsole(async () => await run(["dev", "--port", "abc"]), "error");
+
+    expect(result.exitCode).toBe(1);
+    expect(result.messages.join("\n")).toContain('Invalid port "abc"');
+    expect(result.messages.join("\n")).toContain("bunpress dev --port 3000");
   });
 
   test("interactive progress renderer uses green ansi block cells", () => {
@@ -304,16 +336,30 @@ describe("cli", () => {
     await withCwd(siteRoot, async () => {
       expect(await run(["init", "."])).toBe(0);
       const configPath = path.join(siteRoot, "site.config.ts");
-      const config = await readFile(configPath, "utf8");
-      await writeFile(
-        configPath,
-        config.replace('repo: ""', 'repo: "owner/example-repo"'),
-        "utf8",
-      );
+      await replaceInFile(configPath, 'repo: ""', 'repo: "owner/example-repo"');
+      await replaceInFile(configPath, 'url: "http://localhost:3000/"', 'url: "https://briefing.example.dev/"');
 
       const result = await captureConsole(async () => await run(["publish", "github", "--dry-run"]), "log");
       expect(result.exitCode).toBe(0);
       expect(result.messages.join("\n")).toContain("[dry-run] GitHub publish is configured");
+      expect(result.messages.join("\n")).toContain("[dry-run] Site URL: https://briefing.example.dev/");
+      expect(result.messages.join("\n")).toContain("[dry-run] sitemap.xml -> https://briefing.example.dev/sitemap.xml");
+      expect(result.messages.join("\n")).toContain("[dry-run] If this looks right, run: bunpress publish github");
+    });
+  });
+
+  test("github publish dry-run blocks local placeholder URLs with a clear error", async () => {
+    const siteRoot = await mkdtemp(path.join(os.tmpdir(), "bunpress-cli-gh-url-"));
+    tempDirs.push(siteRoot);
+
+    await withCwd(siteRoot, async () => {
+      expect(await run(["init", "."])).toBe(0);
+      const configPath = path.join(siteRoot, "site.config.ts");
+      await replaceInFile(configPath, 'repo: ""', 'repo: "owner/example-repo"');
+
+      const result = await captureConsole(async () => await run(["publish", "github", "--dry-run"]), "error");
+      expect(result.exitCode).toBe(1);
+      expect(result.messages.join("\n")).toContain("still uses a local URL");
     });
   });
 
@@ -323,6 +369,8 @@ describe("cli", () => {
 
     await withCwd(siteRoot, async () => {
       expect(await run(["init", "."])).toBe(0);
+      const configPath = path.join(siteRoot, "site.config.ts");
+      await replaceInFile(configPath, 'url: "http://localhost:3000/"', 'url: "https://briefing.example.dev/"');
       const result = await captureConsole(async () => await run(["publish", "github"]), "error");
       expect(result.exitCode).toBe(1);
       expect(result.messages.join("\n")).toContain("No GitHub repo configured");
@@ -343,12 +391,8 @@ describe("cli", () => {
       );
 
       const configPath = path.join(siteRoot, "site.config.ts");
-      const config = await readFile(configPath, "utf8");
-      await writeFile(
-        configPath,
-        config.replace('project: ""', 'project: "demo"'),
-        "utf8",
-      );
+      await replaceInFile(configPath, 'project: ""', 'project: "demo"');
+      await replaceInFile(configPath, 'url: "http://localhost:3000/"', 'url: "https://briefing.example.dev/"');
 
       const previousPath = process.env.PATH;
       const stubDir = path.join(siteRoot, "fake-bin");
@@ -373,6 +417,9 @@ describe("cli", () => {
         const result = await captureConsole(async () => await run(["publish", "vercel", "--dry-run"]), "log");
         expect(result.exitCode).toBe(0);
         expect(result.messages.join("\n")).toContain("[dry-run] Vercel publish is configured");
+        expect(result.messages.join("\n")).toContain("[dry-run] Site URL: https://briefing.example.dev/");
+        expect(result.messages.join("\n")).toContain("[dry-run] Would run: vercel deploy");
+        expect(result.messages.join("\n")).toContain("[dry-run] If this looks right, run: bunpress publish vercel");
       } finally {
         process.env.PATH = previousPath;
       }

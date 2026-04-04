@@ -1,46 +1,36 @@
 # BunPress
 
-BunPress is a Bun-first static site generator and publishing CLI for blogs and content sites.
+BunPress is a Bun-first static site generator and publishing CLI for docs, blogs, release notes, and product communication.
 
-## Create a Site
+## Start Fast
 
 ```bash
 npx create-bunpress@latest mysite
-```
-
-Then:
-
-```bash
 cd mysite
 bun install
 bunpress dev
 ```
 
-## In-Project Command
+## Common Workflow
 
 ```bash
-bunpress
-```
-
-## Common Commands
-
-```bash
+bunpress new post "Launch Notes"
 bunpress build
-bunpress clean
-bunpress publish github
-bunpress publish vercel
+bunpress serve
+bunpress publish github --dry-run
+bunpress publish vercel --dry-run
 ```
 
-## Features
+## Highlights
 
-- Create-app onboarding
-- Markdown + front matter content
-- Nunjucks themes
-- Plugin system with theme slots
-- Built-in SEO metadata, sitemap, robots.txt, and favicon support
-- GitHub Pages and Vercel publishing
+- Markdown authoring with front matter
+- File-based Nunjucks themes
+- Local plugins with documented slots and hooks
+- Built-in SEO defaults including sitemap, feeds, metadata, and favicon support
+- GitHub Pages and Vercel publishing flows
 
 ## Links
 
 - GitHub: https://github.com/shovon/bunpress
+- Docs: https://bunpress.dev/
 - Author: https://shovon.bd/

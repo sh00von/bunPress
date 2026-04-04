@@ -14,10 +14,16 @@ You can also use:
 npm create bunpress@latest mysite
 ```
 
-After scaffolding:
+## After Scaffolding
 
 ```bash
 cd mysite
 bun install
 bunpress dev
 ```
+
+## What You Get
+
+- a starter BunPress site
+- starter content, themes, plugins, and scaffolds
+- a local workflow built around `bunpress dev`, `build`, and `publish`

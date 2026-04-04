@@ -7,7 +7,7 @@ const SITE_PACKAGE_JSON = `{
   "type": "module",
   "packageManager": "bun@1.3.10",
   "devDependencies": {
-      "bunpress-kit": "^1.0.5"
+      "bunpress-kit": "^1.0.6"
   },
   "scripts": {
     "dev": "bunpress dev",
@@ -144,60 +144,54 @@ public
 
 const SITE_README = `# BunPress Site
 
-## Getting Started
+## Start Fast
 
 \`\`\`bash
-npx create-bunpress@latest mysite
-\`\`\`
-
-Then:
-
-\`\`\`bash
-cd mysite
 bun install
 bunpress dev
 \`\`\`
 
-Create content:
+Create your first entries:
 
 \`\`\`bash
-bunpress new post "My First Post"
+bunpress new post "Launch Notes"
 bunpress new page "About"
-bunpress new draft "Ideas"
+bunpress new draft "Roadmap Ideas"
 \`\`\`
 
-Run locally:
+## Daily Workflow
 
 \`\`\`bash
 bunpress dev
-\`\`\`
-
-Build production output:
-
-\`\`\`bash
 bunpress build
+bunpress serve
 \`\`\`
 
-Dry-run your publish configuration:
+## Release Checklist
+
+1. Update \`url\` in \`site.config.ts\` to your real production domain.
+2. Run a dry-run first:
 
 \`\`\`bash
 bunpress publish github --dry-run
+# or
 bunpress publish vercel --dry-run
 \`\`\`
 
-Publish for real:
+3. Publish for real:
 
 \`\`\`bash
 bunpress publish github
+# or
 bunpress publish vercel
 \`\`\`
 
-## Scaffolds
+## Customize Scaffolds
 
-Edit files in \`scaffolds/\` to customize the default front matter and body for posts, pages, and drafts.
+Edit files in \`scaffolds/\` to change the default front matter and body for posts, pages, and drafts.
 Use \`bunpress new post "Title" --scaffold custom\` to apply a custom scaffold.
 
-## Starter Generators
+## Generate More Starters
 
 \`\`\`bash
 bunpress init theme my-theme
@@ -1604,7 +1598,9 @@ export async function ensureEmptyOrMissing(targetDir: string): Promise<void> {
   try {
     const entries = await readdir(targetDir);
     if (entries.length > 0) {
-      throw new Error(`Refusing to init into non-empty directory: ${targetDir}`);
+      throw new Error(
+        `Refusing to scaffold into non-empty directory: ${targetDir}. Choose a new folder or empty this one first.`,
+      );
     }
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") {

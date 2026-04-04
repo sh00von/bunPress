@@ -4,6 +4,7 @@ import path from "node:path";
 import { describe, expect, test, afterEach, beforeAll } from "bun:test";
 import { spawn } from "node:child_process";
 import { run } from "./main.ts";
+import createPackage from "../package.json";
 
 const tempDirs: string[] = [];
 const builtCreatePath = path.resolve(import.meta.dir, "../dist/create-bunpress.js");
@@ -80,6 +81,17 @@ describe("create-bunpress", () => {
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain("create-bunpress");
     expect(result.stdout).toContain("npx create-bunpress@latest");
+    expect(result.stdout).toContain("What you get:");
+  });
+
+  test("create-bunpress reports its package version", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "create-bunpress-version-"));
+    tempDirs.push(root);
+
+    const result = await runCreateCommand(root, builtCreatePath, "--version");
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain(createPackage.version);
   });
 
   test("create flow scaffolds a working BunPress site", async () => {
@@ -97,6 +109,7 @@ describe("create-bunpress", () => {
 
     expect(packageJson).toContain('"bunpress-kit"');
     expect(readme).toContain("npx create-bunpress@latest mysite");
+    expect(readme).toContain("## Release Checklist");
     expect(installResult.exitCode).toBe(0);
     expect(buildResult.exitCode).toBe(0);
   });

@@ -4,15 +4,20 @@ BunPress is a Bun-first static site generator and publishing CLI with a file-bas
 
 Open-source project by [Shovon](https://shovon.bd/).
 
-## Create a Site
+## Why It Feels Easy
+
+BunPress is designed for teams that want to publish without turning content into a big frontend project.
+
+- write posts and pages in Markdown
+- configure the site in one file
+- customize themes with Nunjucks
+- extend behavior with local plugins
+- ship static output to GitHub Pages or Vercel
+
+## Start Fast
 
 ```bash
 npx create-bunpress@latest mysite
-```
-
-Then:
-
-```bash
 cd mysite
 bun install
 bunpress dev
@@ -31,6 +36,13 @@ bunpress publish github
 bunpress publish vercel
 ```
 
+## Read Next
+
+- [Getting Started](./my-docs-website/docs/getting-started.md)
+- [Feature Overview](./my-docs-website/docs/features.md)
+- [Theme Overview](./my-docs-website/docs/themes/overview.md)
+- [Plugin Overview](./my-docs-website/docs/plugins/overview.md)
+
 ## Security Model
 
 BunPress escapes template output and sanitizes markdown/content URLs by default, but local extension code is still fully trusted.
@@ -41,7 +53,7 @@ BunPress escapes template output and sanitizes markdown/content URLs by default,
 
 Do not build sites, themes, or plugins from untrusted sources unless you are comfortable executing their code locally.
 
-## Documentation
+## Full Documentation
 
 - [Getting Started](./my-docs-website/docs/getting-started.md)
 - [Feature Overview](./my-docs-website/docs/features.md)

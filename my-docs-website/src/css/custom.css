@@ -7,11 +7,15 @@
   --ifm-color-primary-lighter: #3b3b3b;
   --ifm-color-primary-lightest: #555555;
   --ifm-background-color: #ffffff;
+  --ifm-background-surface-color: #ffffff;
   --ifm-font-family-base: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --ifm-heading-font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --ifm-code-font-size: 95%;
   --ifm-navbar-background-color: rgba(255, 255, 255, 0.92);
   --ifm-footer-background-color: #fafafa;
+  --bunpress-accent: #d86b2c;
+  --bunpress-accent-soft: rgba(216, 107, 44, 0.12);
+  --bunpress-border-strong: rgba(17, 17, 17, 0.12);
 }
 
 html[data-theme='dark'] {
@@ -48,4 +52,186 @@ html[data-theme='dark'] {
 
 .footer {
   border-top: 1px solid rgba(17, 17, 17, 0.08);
+}
+
+.theme-doc-markdown {
+  max-width: none;
+}
+
+.theme-doc-markdown > header {
+  margin-bottom: 1.5rem;
+}
+
+.docs-home {
+  display: grid;
+  gap: 3rem;
+}
+
+.docs-home__hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(2rem, 5vw, 4rem);
+  border: 1px solid var(--bunpress-border-strong);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(216, 107, 44, 0.18), transparent 32%),
+    linear-gradient(180deg, #fffdf9 0%, #ffffff 100%);
+  box-shadow: 0 24px 70px rgba(17, 17, 17, 0.06);
+}
+
+.docs-home__hero h1,
+.docs-home__section-heading h2 {
+  margin: 0;
+  max-width: 12ch;
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+}
+
+.docs-home__section-heading h2 {
+  max-width: 16ch;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.02;
+}
+
+.docs-home__eyebrow {
+  margin: 0 0 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bunpress-accent);
+}
+
+.docs-home__lede {
+  max-width: 64ch;
+  margin: 1.25rem 0 0;
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: rgba(17, 17, 17, 0.78);
+}
+
+.docs-home__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 1.5rem;
+}
+
+.docs-home__actions .button {
+  border-radius: 999px;
+  padding-inline: 1.3rem;
+}
+
+.docs-home__actions .button--primary {
+  --ifm-button-background-color: #111111;
+  --ifm-button-border-color: #111111;
+  --ifm-button-color: #ffffff;
+}
+
+.docs-home__command-strip {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+.docs-home__command-strip code {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.7rem 0.9rem;
+  border-radius: 14px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 30px rgba(17, 17, 17, 0.04);
+}
+
+.docs-home__section {
+  display: grid;
+  gap: 1.4rem;
+}
+
+.docs-home__section--compact {
+  gap: 1rem;
+}
+
+.docs-home__grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.docs-home__grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.docs-home__grid--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.docs-home__card,
+.docs-home__path {
+  padding: 1.35rem;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), #faf8f4);
+}
+
+.docs-home__card h3,
+.docs-home__path h3 {
+  margin-bottom: 0.7rem;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+}
+
+.docs-home__card p,
+.docs-home__path p {
+  margin-bottom: 0;
+  color: rgba(17, 17, 17, 0.74);
+}
+
+.docs-home__path a,
+.docs-home__link-grid a {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.docs-home__path a:hover,
+.docs-home__link-grid a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.docs-home__card pre {
+  margin: 0;
+  box-shadow: none;
+}
+
+.docs-home__card code {
+  font-size: 0.9rem;
+}
+
+.docs-home__link-grid {
+  display: grid;
+  gap: 0.85rem 1.25rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 996px) {
+  .docs-home__grid,
+  .docs-home__grid--three,
+  .docs-home__grid--two,
+  .docs-home__link-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .docs-home__hero {
+    padding: 1.5rem;
+    border-radius: 22px;
+  }
+
+  .docs-home__hero h1,
+  .docs-home__section-heading h2 {
+    max-width: none;
+  }
 }

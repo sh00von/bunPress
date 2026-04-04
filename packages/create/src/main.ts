@@ -1,6 +1,7 @@
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
 import { ensureEmptyOrMissing, scaffoldSite } from "../../cli/src/scaffold.ts";
+import createPackage from "../package.json";
 
 function helpText() {
   return `create-bunpress
@@ -12,6 +13,11 @@ Usage:
 Examples:
   npx create-bunpress@latest mysite
   npm create bunpress@latest mysite
+
+What you get:
+  - a starter BunPress site
+  - starter content, theme files, plugins, and scaffolds
+  - a local workflow built around bunpress dev/build/publish
 `;
 }
 
@@ -25,7 +31,7 @@ export async function run(argv: string[]): Promise<number> {
     }
 
     if (first === "--version" || first === "-v") {
-      console.log("create-bunpress 1.0.0");
+      console.log(`create-bunpress ${createPackage.version}`);
       return 0;
     }
 
@@ -41,6 +47,7 @@ export async function run(argv: string[]): Promise<number> {
     console.log(`  cd ${relativeTarget}`);
     console.log("  bun install");
     console.log("  bunpress dev");
+    console.log('  bunpress new post "Launch Notes"');
 
     return 0;
   } catch (error) {
